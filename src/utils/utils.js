@@ -4,48 +4,35 @@ export function validacaoSenha(senha) {
 
   if (senha.length < 8) {
     erros.push(`A senha precisa conter mais de 8 caracteres.`);
-    return;
+    return { valida: false, erros };
   }
 
   const possuiMaiuscula = /[A-Z]/.test(senha);
   if (!possuiMaiuscula) {
     erros.push(`A senha precisa conter pelo menos uma letra maiúscula.`);
-    return;
+    return { valida: false, erros };
   }
 
   const possuiMinuscula = /[a-z]/.test(senha);
   if (!possuiMinuscula) {
     erros.push(`A senha precisa conter pelo menos uma letra minúscula.`);
-    return;
+    return { valida: false, erros };
   }
 
   const possuiNumero = /[0-9]/.test(senha);
   if (!possuiNumero) {
     erros.push(`A senha precisa conter pelo menos um número.`);
-    return;
+    return { valida: false, erros };
   }
 
   const especiais = ['!', '@', '#', '*', '%', '$'];
   if (!especiais.some((char) => senha.includes(char))) {
     erros.push('A senha precisa conter pelo menos um caractere especial.');
-    return;
-  }
-
-  if (erros.length > 0) {
-    // console.log(erros.join('\n'));
     return { valida: false, erros };
   }
 
-  // console.log(`Senha válida!`);
   return { valida: true, erros: [] };
 }
-
-// Testando validação de senha
-// console.log(validacaoSenha('Exemplo@'));
-// console.log(validacaoSenha('Exemplo123'));
-// console.log(validacaoSenha('exemplo@123'));
-// console.log(validacaoSenha('EXEMPLO@123'));
-// console.log(validacaoSenha('Exemplo@123'));
 
 //validar email
 export function validacaoEmail(email) {
@@ -53,20 +40,10 @@ export function validacaoEmail(email) {
   const valido = regex.test(email);
 
   if (!valido) {
-    console.log(`O email "${email}" é inválido.`);
     return { valido: false, email };
-  } else {
-    console.log(`O email "${email}" é válido.`);
-    return { valido: true, email };
   }
+  return { valido: true, email };
 }
-
-// Testando validação de email
-// console.log(validacaoEmail('exemplo@dominio.com'));
-// console.log(validacaoEmail('exemplo@dominio'));
-// console.log(validacaoEmail('exemplo.com'));
-// console.log(validacaoEmail('@dominio.com'));
-// console.log(validacaoEmail('exemplo@.com'));
 
 //classificar semana
 export const diasDaSemana = {
@@ -87,8 +64,6 @@ export function obterNumeroDia(nomeDia) {
   }
   return { sucesso: false, erro: 'Dia da semana inválido' };
 }
-
-// console.log(obterNumeroDia('Sexta'));
 
 //data biblioteca  INSTALA: npm install date-fns
 import { parse, format } from 'date-fns';
@@ -120,8 +95,6 @@ export function formatarData(dataString) {
     };
   }
 }
-
-// console.log(formatarData('29/08/2025'));
 
 // horario biblioteca    INSTALA: npm install dayjs
 import dayjs from 'dayjs';
@@ -155,8 +128,6 @@ export function formatarHora(horaString) {
     };
   }
 }
-
-// console.log(formatarHora('14:30'));
 
 // Função para validar múltiplos emails de uma vez
 export function validarEmails(emails) {

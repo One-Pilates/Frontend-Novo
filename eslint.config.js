@@ -34,7 +34,24 @@ export default [
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
-      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+
+      // Prevenir erros comuns
+      'no-console': ['error', { allow: ['error'] }], // Permite apenas console.error
+      'no-debugger': 'error',
+      'no-alert': 'error',
+      'no-unused-vars': [
+        'error',
+        {
+          varsIgnorePattern: '^[A-Z_]',
+          argsIgnorePattern: '^_',
+        },
+      ],
+      'no-var': 'error',
+      'prefer-const': 'error',
+      eqeqeq: 'error',
+      'no-duplicate-imports': 'error',
+
+      // Formatação
       camelcase: ['error', { properties: 'always', ignoreDestructuring: false }],
       'max-len': [
         'error',
@@ -45,19 +62,16 @@ export default [
           ignoreTemplateLiterals: true,
         },
       ],
-      eqeqeq: 'error',
-      'prefer-const': 'error',
-      'no-var': 'error',
-      'no-duplicate-imports': 'error',
 
       'prettier/prettier': 'error',
 
+      // React
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
       'react/jsx-pascal-case': 'error',
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
 
-      // Regras React Hooks mais flexíveis
+      // React Hooks
       'react-hooks/exhaustive-deps': 'warn',
       'react-hooks/set-state-in-effect': 'off',
     },
