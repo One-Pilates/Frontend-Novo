@@ -1,7 +1,7 @@
 import Swal from 'sweetalert2';
-// import { jsPDF } from "jspdf";
-// import "jspdf-autotable";
-// import * as XLSX from "xlsx";
+import { jsPDF } from 'jspdf';
+import 'jspdf-autotable';
+import * as XLSX from 'xlsx';
 
 export const abrirModalDownload = async (students, calculateAge) => {
   const result = await Swal.fire({

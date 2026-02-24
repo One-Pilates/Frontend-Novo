@@ -72,6 +72,7 @@ export default function RegisterStudent() {
       bairro: '',
       cidade: '',
       estado: '',
+      uf: '',
     },
   );
 
@@ -91,23 +92,32 @@ export default function RegisterStudent() {
 
   const atualizarDadosPessoais = (novos) => {
     setDadosPessoais((prev) => ({ ...prev, ...novos }));
-    if (erros.dadosPessoais) {
-      setErros((prev) => ({ ...prev, dadosPessoais: {} }));
+    // Limpa os erros dos campos que estão sendo atualizados
+    const camposAtualizados = Object.keys(novos);
+    if (camposAtualizados.some((campo) => erros[campo])) {
+      setErros((prev) => {
+        const novosErros = { ...prev };
+        camposAtualizados.forEach((campo) => delete novosErros[campo]);
+        return novosErros;
+      });
     }
   };
 
   const atualizarEndereco = (novos) => {
     setEndereco((prev) => ({ ...prev, ...novos }));
-    if (erros.endereco) {
-      setErros((prev) => ({ ...prev, endereco: {} }));
+    // Limpa os erros dos campos que estão sendo atualizados
+    const camposAtualizados = Object.keys(novos);
+    if (camposAtualizados.some((campo) => erros[campo])) {
+      setErros((prev) => {
+        const novosErros = { ...prev };
+        camposAtualizados.forEach((campo) => delete novosErros[campo]);
+        return novosErros;
+      });
     }
   };
 
   const atualizarInformacoesAluno = (novos) => {
     setInformacoesAluno((prev) => ({ ...prev, ...novos }));
-    if (erros.informacoesAluno) {
-      setErros((prev) => ({ ...prev, informacoesAluno: {} }));
-    }
   };
 
   // Buscar CEP usando ViaCEP API
@@ -124,6 +134,7 @@ export default function RegisterStudent() {
             logradouro: data.logradouro || '',
             bairro: data.bairro || '',
             cidade: data.localidade || '',
+            uf: data.uf || '',
             estado: data.uf || '',
           });
         } else {
@@ -156,19 +167,40 @@ export default function RegisterStudent() {
       }
       if (!dadosPessoais.dataNascimento) {
         novosErros.dataNascimento = 'Data de nascimento é obrigatória';
+      } else {
+        const hoje = new Date();
+        hoje.setHours(0, 0, 0, 0);
+        const nascimento = new Date(dadosPessoais.dataNascimento);
+        if (nascimento >= hoje) {
+          novosErros.dataNascimento = 'Data de nascimento não pode ser hoje ou no futuro';
+        } else {
+          const idadeMs = hoje - nascimento;
+          const anos = idadeMs / (1000 * 60 * 60 * 24 * 365.25);
+          if (anos > 120) {
+            novosErros.dataNascimento = 'Data de nascimento inválida';
+          }
+        }
       }
       if (!dadosPessoais.telefone.trim()) {
         novosErros.telefone = 'Telefone é obrigatório';
+      } else if (dadosPessoais.telefone.replace(/\D/g, '').length < 10) {
+        novosErros.telefone = 'Telefone inválido (mínimo 10 dígitos)';
       }
     }
 
     if (etapaAtual === 2) {
-      if (!endereco.cep.trim()) novosErros.cep = 'CEP é obrigatório';
+      const cepLimpo = (endereco.cep || '').replace(/\D/g, '');
+      if (!endereco.cep.trim()) {
+        novosErros.cep = 'CEP é obrigatório';
+      } else if (cepLimpo.length !== 8) {
+        novosErros.cep = 'CEP inválido (deve ter 8 dígitos)';
+      }
       if (!endereco.logradouro.trim()) novosErros.logradouro = 'Logradouro é obrigatório';
       if (!endereco.numero.trim()) novosErros.numero = 'Número é obrigatório';
       if (!endereco.bairro.trim()) novosErros.bairro = 'Bairro é obrigatório';
       if (!endereco.cidade.trim()) novosErros.cidade = 'Cidade é obrigatória';
       if (!endereco.estado) novosErros.estado = 'Estado é obrigatório';
+      if (!endereco.uf) novosErros.uf = 'UF é obrigatória';
     }
 
     setErros(novosErros);
@@ -229,6 +261,7 @@ export default function RegisterStudent() {
       bairro: '',
       cidade: '',
       estado: '',
+      uf: '',
     });
 
     setInformacoesAluno({
@@ -243,10 +276,11 @@ export default function RegisterStudent() {
     const payload = {
       nome: dadosPessoais.nomeCompleto || '',
       email: dadosPessoais.email || '',
-      cpf: dadosPessoais.cpf || '',
+      cpf: dadosPessoais.cpf.replace(/\D/g, '') || '',
       dataNascimento: dadosPessoais.dataNascimento || '',
       status: true,
       alunoComLimitacoesFisicas: !!informacoesAluno.problemasMobilidade,
+      observacoes: informacoesAluno.observacoes || '',
       tipoContato: dadosPessoais.telefone || '',
       notificacaoAtiva: true,
       endereco: {
@@ -255,10 +289,12 @@ export default function RegisterStudent() {
         bairro: endereco.bairro || '',
         cidade: endereco.cidade || '',
         estado: endereco.estado || '',
-        cep: endereco.cep || '',
-        uf: endereco.estado || '',
+        cep: endereco.cep.replace(/\D/g, '') || '',
+        uf: endereco.uf || '',
       },
     };
+
+    console.log('📤 Payload para cadastro:', payload);
 
     try {
       await api.post('api/alunos', payload);

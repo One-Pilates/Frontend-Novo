@@ -15,6 +15,8 @@ export default function DashboardSecretary() {
   const [pie, setPie] = useState([]);
   const [frequencia, setFrequencia] = useState([]);
   const [hasData, setHasData] = useState(true);
+  const [_totalAulas, setTotalAulas] = useState(0);
+  const [_top3, setTop3] = useState([]);
 
   const { user } = useAuth();
 

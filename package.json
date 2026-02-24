@@ -25,13 +25,15 @@
     "dotenv": "^17.2.4",
     "highcharts-react-official": "^3.2.3",
     "jspdf": "^3.0.0",
+    "jspdf-autotable": "^5.0.7",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-icons": "^5.5.0",
     "react-router-dom": "^7.13.0",
     "sass": "^1.97.3",
     "sweetalert2": "^11.26.18",
-    "tailwindcss": "^4.1.18"
+    "tailwindcss": "^4.1.18",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
