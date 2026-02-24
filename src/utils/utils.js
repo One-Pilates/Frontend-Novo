@@ -1,3 +1,15 @@
+// Formata telefone de dígitos puros para (XX) XXXXX-XXXX ou (XX) XXXX-XXXX
+export function formatarTelefone(telefone) {
+  if (!telefone) return '';
+  const digits = String(telefone).replace(/\D/g, '');
+  if (digits.length === 11) {
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+  } else if (digits.length === 10) {
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+  }
+  return telefone;
+}
+
 //validar a senha
 export function validacaoSenha(senha) {
   const erros = [];

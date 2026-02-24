@@ -4,6 +4,7 @@ import api from '../../../services/api';
 import userIconImg from '/user-icon.png';
 import Back from '../../../components/Back';
 import '../../Teacher/Profile/style.scss';
+import { formatarTelefone } from '../../../utils/utils';
 
 export default function ProfileView() {
   const { id } = useParams();
@@ -120,7 +121,7 @@ export default function ProfileView() {
             <label className="profile-user__label">Telefone</label>
             <input
               type="tel"
-              value={dadosUser.telefone || ''}
+              value={formatarTelefone(dadosUser.telefone)}
               className="profile-user__input"
               disabled
             />

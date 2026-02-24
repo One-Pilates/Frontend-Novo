@@ -3,6 +3,7 @@ import { useAuth } from '../../../hooks/useAuth';
 import api from '../../../services/api';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
+import { formatarTelefone } from '../../../utils/utils';
 import {
   FiUser,
   FiMail,
@@ -71,7 +72,7 @@ const ProfileUser = () => {
         : userIconImg,
       email: user?.email || '',
       dataNascimento: user?.idade || user?.dataNascimento || '',
-      telefone: user?.telefone || '',
+      telefone: formatarTelefone(user?.telefone) || '',
       receberNotificacao: user?.notificacaoAtiva ?? user?.receberNotificacao ?? false,
     };
 
@@ -210,7 +211,7 @@ const ProfileUser = () => {
         nome: userData.nome.trim(),
         email: userData.email,
         idade: userData.dataNascimento,
-        telefone: userData.telefone,
+        telefone: userData.telefone.replace(/\D/g, ''),
         notificacaoAtiva: userData.receberNotificacao,
       };
 
@@ -230,8 +231,9 @@ const ProfileUser = () => {
       setOriginalData(updatedData);
       setOriginalSpecialties(new Set(selectedSpecialties));
 
-      setUser(data);
-      localStorage.setItem('user', JSON.stringify(data));
+      const mergedUser = { ...data, telefone: userDTO.telefone };
+      setUser(mergedUser);
+      localStorage.setItem('user', JSON.stringify(mergedUser));
 
       setHasChanged(false);
 
@@ -263,6 +265,23 @@ const ProfileUser = () => {
       });
       console.error('Erro ao atualizar dados:', error);
     }
+  };
+
+  const handleTelefoneChange = (e) => {
+    const digits = e.target.value.replace(/\D/g, '').slice(0, 11);
+    let formatted = '';
+    if (digits.length === 0) {
+      formatted = '';
+    } else if (digits.length <= 2) {
+      formatted = `(${digits}`;
+    } else if (digits.length <= 6) {
+      formatted = `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+    } else if (digits.length <= 10) {
+      formatted = `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+    } else {
+      formatted = `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+    }
+    setUserData({ ...userData, telefone: formatted });
   };
 
   const toggleSpecialty = (especialidadeId) => {
@@ -411,7 +430,8 @@ const ProfileUser = () => {
                 <input
                   type="tel"
                   value={userData.telefone}
-                  onChange={(e) => setUserData({ ...userData, telefone: e.target.value })}
+                  onChange={handleTelefoneChange}
+                  maxLength={16}
                   className="w-full pl-12 pr-4 py-3 bg-(--bg-claro) border-2 border-transparent rounded-xl text-(--text-escuro) focus:border-(--laranja-principal) focus:bg-white transition-all outline-none"
                   placeholder="(00) 00000-0000"
                 />

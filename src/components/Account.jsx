@@ -133,7 +133,7 @@ function Account() {
               </button>
 
               <button
-                onClick={() => navigate('/redifinir-senha')}
+                onClick={() => navigate('/esqueci-senha')}
                 className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-left transition-colors flex items-center gap-3 hover:bg-gray-50 active:bg-gray-100"
                 style={{
                   backgroundColor: 'var(--branco)',
