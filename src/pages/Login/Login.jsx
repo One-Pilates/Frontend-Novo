@@ -5,6 +5,7 @@ import './Login.scss';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
+import { FcGoogle } from 'react-icons/fc';
 import BackgroundLogin from '../../components/BackgroundLogin';
 
 export default function Login() {
@@ -43,13 +44,20 @@ export default function Login() {
     <div className="login">
       <div className="login__container" role="region" aria-label="Formulário de login">
         <div className="login__header">
-          <h1 id="login-title" className="login__title">
-            Login
-          </h1>
-          <p className="login__subtitle">Porque seu corpo é único!</p>
+          <h1 className="login__title">Login</h1>
+          <p className="login__subtitle">Porque seu corpo é único</p>
         </div>
 
-        <form className="login__form" onSubmit={handleLogin} aria-describedby="login-help">
+        <button type="button" className="login__social-btn">
+          <FcGoogle size={22} />
+          <span>Continuar com Google</span>
+        </button>
+
+        <div className="login__divider">
+          <span>ou</span>
+        </div>
+
+        <form className="login__form" onSubmit={handleLogin}>
           <div className="login__field">
             <label htmlFor="email" className="login__label">
               Email
@@ -61,7 +69,7 @@ export default function Login() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="login__input"
-              placeholder="onepilates@onepilates.com"
+              placeholder="onepilates@email.com"
               required
             />
           </div>
@@ -78,7 +86,7 @@ export default function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="login__input"
-                placeholder="********"
+                placeholder="••••••••"
                 required
               />
               <button
@@ -92,21 +100,16 @@ export default function Login() {
             </div>
           </div>
 
-          <div className="login__checkbox">
-            <input
-              type="checkbox"
-              id="remember"
-              checked={rememberMe}
-              onChange={(e) => setRememberMe(e.target.checked)}
-            />
-            <label htmlFor="remember">Lembrar senha</label>
-          </div>
-
-          <button type="submit" className="login__button" disabled={isLoading}>
-            {isLoading ? 'Entrando...' : 'Entrar'}
-          </button>
-
-          <div className="login__links" id="login-help">
+          <div className="login__bottom-row">
+            <div className="login__checkbox">
+              <input
+                type="checkbox"
+                id="remember"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+              />
+              <label htmlFor="remember">Lembrar senha</label>
+            </div>
             <button
               type="button"
               onClick={() => navigate('/esqueci-senha')}
@@ -115,12 +118,23 @@ export default function Login() {
               Esqueci minha senha
             </button>
           </div>
+
+          <button type="submit" className="login__button" disabled={isLoading}>
+            {isLoading ? 'Entrando...' : 'Entrar'}
+          </button>
         </form>
 
-        <p className="login__contact">Precisa de acesso? Contate o administrador.</p>
+        <p className="login__contact">
+          Precisa de acesso? <span>Contate o administrador</span>
+        </p>
       </div>
 
       <BackgroundLogin />
+
+      <p className="login__terms">
+        Ao continuar, você concorda com nossos <span>Termos de Uso</span> e{' '}
+        <span>Política de Privacidade</span>.
+      </p>
     </div>
   );
 }
