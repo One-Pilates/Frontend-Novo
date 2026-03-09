@@ -39,7 +39,9 @@ export default function Etapa1DataHora(props) {
       </div>
 
       <div className="form-group">
-        <label htmlFor="horario">Horário *</label>
+        <label htmlFor="horario">
+          Horário <span className="required">*</span>
+        </label>
         <select
           id="horario"
           value={dataHora.horario}

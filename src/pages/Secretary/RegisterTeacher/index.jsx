@@ -9,25 +9,8 @@ import DadosPessoaisScreen from './screens/DadosPessoais';
 import EnderecoScreen from './screens/Endereco';
 import InformacoesProfissionaisScreen from './screens/InformacoesProfissionais';
 import ConfirmacaoScreen from './screens/Confirmacao';
+import { validarCPF, validarEmail } from '../../../utils/utils';
 import './style.scss';
-
-const validarCPF = (cpf) => {
-  cpf = cpf.replace(/\D/g, '');
-  if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) return false;
-  let soma = 0,
-    resto;
-  for (let i = 1; i <= 9; i++) soma += parseInt(cpf.substring(i - 1, i)) * (11 - i);
-  resto = (soma * 10) % 11;
-  if (resto === 10 || resto === 11) resto = 0;
-  if (resto !== parseInt(cpf.substring(9, 10))) return false;
-  soma = 0;
-  for (let i = 1; i <= 10; i++) soma += parseInt(cpf.substring(i - 1, i)) * (12 - i);
-  resto = (soma * 10) % 11;
-  if (resto === 10 || resto === 11) resto = 0;
-  return resto === parseInt(cpf.substring(10, 11));
-};
-
-const validarEmail = (email) => /^[^\s@]+@[^\s@]+.[^\s@]+$/.test(email);
 
 export default function RegisterTeacher() {
   const navigate = useNavigate();
@@ -192,21 +175,43 @@ export default function RegisterTeacher() {
         console.log('❌ CPF inválido:', dadosPessoais.cpf);
       }
       if (!dadosPessoais.dataNascimento) {
-        novosErros.dataNascimento = 'Data obrigatória';
+        novosErros.dataNascimento = 'Data de nascimento é obrigatória';
         console.log('❌ Data vazia');
+      } else {
+        const hoje = new Date();
+        hoje.setHours(0, 0, 0, 0);
+        const nascimento = new Date(dadosPessoais.dataNascimento);
+        if (nascimento >= hoje) {
+          novosErros.dataNascimento = 'Data de nascimento não pode ser hoje ou no futuro';
+          console.log('❌ Data no futuro ou hoje');
+        } else {
+          const idadeMs = hoje - nascimento;
+          const anos = idadeMs / (1000 * 60 * 60 * 24 * 365.25);
+          if (anos > 120) {
+            novosErros.dataNascimento = 'Data de nascimento inválida';
+            console.log('❌ Data acima de 120 anos');
+          }
+        }
       }
       if (!dadosPessoais.telefone.trim()) {
-        novosErros.telefone = 'Telefone obrigatório';
+        novosErros.telefone = 'Telefone é obrigatório';
         console.log('❌ Telefone vazio');
+      } else if (dadosPessoais.telefone.replace(/\D/g, '').length < 10) {
+        novosErros.telefone = 'Telefone inválido (mínimo 10 dígitos)';
+        console.log('❌ Telefone com menos de 10 dígitos');
       }
     }
 
     if (etapaAtual === 2) {
       console.log('📋 Endereço:', endereco);
 
+      const cepLimpo = (endereco.cep || '').replace(/\D/g, '');
       if (!endereco.cep.trim()) {
-        novosErros.cep = 'CEP obrigatório';
+        novosErros.cep = 'CEP é obrigatório';
         console.log('❌ CEP vazio');
+      } else if (cepLimpo.length !== 8) {
+        novosErros.cep = 'CEP inválido (deve ter 8 dígitos)';
+        console.log('❌ CEP inválido:', cepLimpo);
       }
       if (!endereco.logradouro.trim()) {
         novosErros.logradouro = 'Logradouro obrigatório';

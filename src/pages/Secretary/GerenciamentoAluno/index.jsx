@@ -201,75 +201,82 @@ export default function GerenciamentoAluno() {
           }}
         >
           <div className="overflow-x-auto flex-1">
-            <table className="w-full table-auto min-w-[640px]">
+            <table className="w-full table-auto min-w-160">
               <thead
-                className="border-b text-sm font-semibold"
+                className="text-xs font-semibold uppercase tracking-wider"
                 style={{
-                  backgroundColor: 'var(--branco)',
-                  borderBottomColor: 'var(--cor-borda)',
+                  backgroundColor: 'var(--bg-claro)',
+                  borderBottom: '2px solid var(--cor-borda)',
                 }}
               >
                 <tr>
                   <th
                     className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs sm:text-sm font-semibold"
-                    style={{ color: 'var(--text-escuro)' }}
+                    style={{ color: 'var(--text-cinza)' }}
                   >
                     Nome do Aluno
                   </th>
                   <th
-                    className="hidden lg:table-cell px-3 sm:px-6 py-3 sm:py-4 text-left text-xs sm:text-sm font-semibold"
-                    style={{ color: 'var(--text-escuro)' }}
+                    className="hidden lg:table-cell px-3 sm:px-6 py-3 sm:py-4 text-left text-xs sm:text-sm font-extra-bold"
+                    style={{ color: 'var(--text-cinza)' }}
                   >
                     Email
                   </th>
                   <th
-                    className="hidden md:table-cell px-3 sm:px-6 py-3 sm:py-4 text-left text-xs sm:text-sm font-semibold"
-                    style={{ color: 'var(--text-escuro)' }}
+                    className="hidden md:table-cell px-3 sm:px-6 py-3 sm:py-4 text-left text-xs sm:text-sm font-extra-bold"
+                    style={{ color: 'var(--text-cinza)' }}
                   >
                     CPF
                   </th>
                   <th
                     className="hidden sm:table-cell px-3 sm:px-6 py-3 sm:py-4 text-left text-xs sm:text-sm font-semibold"
-                    style={{ color: 'var(--text-escuro)' }}
+                    style={{ color: 'var(--text-cinza)' }}
                   >
                     Idade
                   </th>
                   <th
                     className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs sm:text-sm font-semibold"
-                    style={{ color: 'var(--text-escuro)' }}
+                    style={{ color: 'var(--text-cinza)' }}
                   >
                     Status
                   </th>
                   <th
                     className="hidden xl:table-cell px-3 sm:px-6 py-3 sm:py-4 text-left text-xs sm:text-sm font-semibold"
-                    style={{ color: 'var(--text-escuro)' }}
+                    style={{ color: 'var(--text-cinza)' }}
                   >
                     Limitações
                   </th>
                   <th
                     className="px-3 sm:px-6 py-3 sm:py-4 text-center text-xs sm:text-sm font-semibold"
-                    style={{ color: 'var(--text-escuro)' }}
+                    style={{ color: 'var(--text-cinza)' }}
                   >
                     Ações
                   </th>
                 </tr>
               </thead>
 
-              <tbody className="divide-y" style={{ borderColor: 'var(--cor-borda)' }}>
+              <tbody>
                 {currentStudents && currentStudents.length > 0 ? (
-                  currentStudents.map((aluno) => (
+                  currentStudents.map((aluno, index) => (
                     <tr
                       key={aluno.id}
-                      className="transition hover:bg-gray-50 dark:hover:bg-gray-800"
+                      className="transition-colors duration-150"
                       style={{
                         backgroundColor: 'var(--branco)',
                         color: 'var(--text-escuro)',
+                        borderTop: index === 0 ? 'none' : '1px solid var(--cor-borda)',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = 'var(--bg-claro)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'var(--branco)';
                       }}
                     >
                       <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm">
                         <button
                           onClick={() => navigate(`/secretaria/perfil/aluno/${aluno.id}`)}
-                          className="hover:underline text-left font-medium"
+                          className="text-left hover:underline font-medium"
                         >
                           {aluno.nome}
                         </button>
@@ -315,7 +322,7 @@ export default function GerenciamentoAluno() {
                             onClick={() => deleteAluno(aluno.id)}
                             className="p-1.5 sm:p-2 text-red-600 hover:bg-red-100 rounded-lg transition"
                           >
-                            <FiTrash2 size={16} className="sm:w-[18px] sm:h-[18px]" />
+                            <FiTrash2 size={16} className="sm:w-4.5 sm:h-4.5" />
                           </button>
                         </div>
                       </td>
@@ -345,7 +352,7 @@ export default function GerenciamentoAluno() {
               }}
             >
               <div
-                className="text-xs sm:text-sm order-2 sm:order-1"
+                className="text-xs sm:text-sm order-2 sm:order-1 font-medium"
                 style={{ color: 'var(--text-cinza)' }}
               >
                 Mostrando {startIndex + 1} a {Math.min(endIndex, filteredStudents.length)} de{' '}
@@ -364,7 +371,7 @@ export default function GerenciamentoAluno() {
                     borderWidth: '1px',
                   }}
                 >
-                  <FiArrowLeft size={16} className="sm:w-[18px] sm:h-[18px]" />
+                  <FiArrowLeft size={16} className="sm:w-4.5 sm:h-4.5" />
                 </button>
 
                 <div className="flex items-center gap-1">
@@ -439,7 +446,7 @@ export default function GerenciamentoAluno() {
                     borderWidth: '1px',
                   }}
                 >
-                  <FiArrowRight size={16} className="sm:w-[18px] sm:h-[18px]" />
+                  <FiArrowRight size={16} className="sm:w-4.5 sm:h-4.5" />
                 </button>
               </div>
             </div>
