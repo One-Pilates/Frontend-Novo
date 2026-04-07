@@ -5,7 +5,7 @@ import api from '../../../../services/api';
 import Swal from 'sweetalert2';
 import { toast } from 'sonner';
 import { getColorForEspecialidade } from '../../../../utils/utils';
-import '../Styles/Modal.scss';
+import '../styles/Modal.scss';
 
 const AgendamentoModal = ({ isOpen, agendamento, onClose, onDelete }) => {
   const [activeTab, setActiveTab] = useState('informacoes');
