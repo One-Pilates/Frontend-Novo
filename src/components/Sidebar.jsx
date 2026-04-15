@@ -17,7 +17,7 @@ export default function SidebarTeacher({ navAberta, setNavAberta }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { logout } = useAuth();
-  const isActive = (path) => location.pathname === path;
+  const isActive = (path) => location.pathname === path || location.pathname.startsWith(`${path}/`);
 
   const handleNavigate = (path) => {
     navigate(path);
@@ -61,7 +61,7 @@ export default function SidebarTeacher({ navAberta, setNavAberta }) {
 
           <div className="flex justify-center py-4 md:py-8">
             <img
-              src="../logoMinimalistaBranca.png"
+              src="/logoMinimalistaBranca.png"
               alt="logo"
               className={`${navAberta ? 'w-24 md:w-32' : 'w-12'} transition-all`}
             />
@@ -115,7 +115,12 @@ export function SidebarSecretary({ navAberta, setNavAberta }) {
 
   const basePath = user.role === 'ADMINISTRADOR' ? '/admin' : '/secretaria';
 
-  const isActive = (path) => location.pathname === path;
+  const isActive = (path) => location.pathname === path || location.pathname.startsWith(`${path}/`);
+
+  const isAgendaActive = isActive(`${basePath}/agenda`) || isActive(`${basePath}/agendamento`);
+
+  const isProfessorActive = isActive(`${basePath}/professor`);
+  const isAlunosActive = isActive(`${basePath}/alunos`) || isActive(`${basePath}/aluno`);
 
   const handleNavigate = (path) => {
     navigate(path);
@@ -159,7 +164,7 @@ export function SidebarSecretary({ navAberta, setNavAberta }) {
 
           <div className="flex justify-center py-4 md:py-8">
             <img
-              src="../logoMinimalistaBranca.png"
+              src="/logoMinimalistaBranca.png"
               alt="logo"
               className={`${navAberta ? 'w-24 md:w-32' : 'w-12'} transition-all`}
             />
@@ -183,21 +188,21 @@ export function SidebarSecretary({ navAberta, setNavAberta }) {
               icon={FaCalendarAlt}
               texto="Agenda"
               navAberta={navAberta}
-              ativo={isActive(`${basePath}/agenda`)}
+              ativo={isAgendaActive}
               onClick={() => handleNavigate(`${basePath}/agenda`)}
             />
             <ItemSidebar
               icon={FaChalkboardTeacher}
               texto="Professor"
               navAberta={navAberta}
-              ativo={isActive(`${basePath}/professor`)}
+              ativo={isProfessorActive}
               onClick={() => handleNavigate(`${basePath}/professor`)}
             />
             <ItemSidebar
               icon={FaUsers}
               texto="Alunos"
               navAberta={navAberta}
-              ativo={isActive(`${basePath}/alunos`)}
+              ativo={isAlunosActive}
               onClick={() => handleNavigate(`${basePath}/alunos`)}
             />
             {user.role === 'ADMINISTRADOR' && (

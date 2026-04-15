@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { FaCamera } from 'react-icons/fa';
+import { FaCamera, FaUser } from 'react-icons/fa';
 import Input from '../components/Input';
 import './dadosPessoais.scss';
 
@@ -18,7 +18,16 @@ export default function DadosPessoaisScreen({ dados, atualizar, erros = {} }) {
   };
 
   return (
-    <div className="dados-pessoais-screen">
+    <div className="dados-pessoais-screen etapa-content">
+      <div className="etapa-header">
+        <div className="etapa-icon">
+          <FaUser size={18} />
+        </div>
+        <div className="etapa-title-group">
+          <h2>Dados Pessoais</h2>
+          <p>Informações básicas do professor</p>
+        </div>
+      </div>
       <div className="photo-section">
         <div className="photo-container">
           {dados.fotoPerfil ? (

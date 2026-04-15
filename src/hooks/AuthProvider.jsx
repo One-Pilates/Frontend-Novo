@@ -13,8 +13,13 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
-    if (savedUser) {
+    const savedToken = localStorage.getItem('token');
+
+    if (savedUser && savedToken && savedToken !== 'undefined' && savedToken !== 'null') {
       setUser(JSON.parse(savedUser));
+    } else {
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
     }
     setIsCheckingAuth(false);
   }, []);
@@ -26,7 +31,25 @@ export function AuthProvider({ children }) {
       const response = await api.post('/auth/login', { email, senha });
       const data = response.data;
 
-      localStorage.setItem('token', data.token);
+      const tokenCandidate =
+        data?.token ||
+        data?.accessToken ||
+        data?.jwt ||
+        data?.bearerToken ||
+        data?.funcionario?.token ||
+        '';
+
+      const tokenRaw = tokenCandidate.toString().trim();
+      const token = tokenRaw.toLowerCase().startsWith('bearer ')
+        ? tokenRaw.substring(7).trim()
+        : tokenRaw;
+
+      if (!token) {
+        toast.error('Falha de autenticação: token não recebido no login.');
+        return false;
+      }
+
+      localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(data.funcionario));
 
       setUser(data.funcionario);

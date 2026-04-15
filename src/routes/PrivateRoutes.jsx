@@ -6,12 +6,14 @@ import LoadingSpinner from '../components/LoadingSpinner';
 const PrivateRoutes = ({ allowedRoles }) => {
   const { user, isCheckingAuth } = useAuth();
   const location = useLocation();
+  const token = localStorage.getItem('token');
+  const hasValidToken = !!token && token !== 'undefined' && token !== 'null';
 
   if (isCheckingAuth) {
     return <LoadingSpinner />;
   }
 
-  if (!user) {
+  if (!user || !hasValidToken) {
     return <Navigate to="/" replace />;
   }
 

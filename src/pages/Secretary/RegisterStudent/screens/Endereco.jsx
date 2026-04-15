@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { FaMapMarkerAlt } from 'react-icons/fa';
 import Input from '../components/Input';
 import './endereco.scss';
 
@@ -33,7 +34,16 @@ export default function EnderecoScreen({ dados, atualizar, buscarCep, erros = {}
   };
 
   return (
-    <div className="endereco-screen">
+    <div className="endereco-screen etapa-content">
+      <div className="etapa-header">
+        <div className="etapa-icon">
+          <FaMapMarkerAlt size={18} />
+        </div>
+        <div className="etapa-title-group">
+          <h2>Endereço</h2>
+          <p>Local de residência do aluno</p>
+        </div>
+      </div>
       <div className="address-grid">
         <Input
           label="CEP"

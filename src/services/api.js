@@ -7,9 +7,41 @@ export const api = axios.create({
     Accept: 'application/json',
   },
 });
+
+function normalizeToken(rawToken) {
+  if (!rawToken) return '';
+
+  const semAspas = rawToken.trim().replace(/^"|"$/g, '');
+  if (!semAspas) return '';
+
+  return semAspas.toLowerCase().startsWith('bearer ')
+    ? semAspas.substring(7).trim()
+    : semAspas;
+}
+
+function isAuthenticationFailure(error) {
+  const status = error?.response?.status;
+  const data = error?.response?.data;
+  const msg = typeof data === 'string' ? data : data?.message || data?.erro || '';
+
+  if (status === 401) return true;
+  if (status === 400 && /authentication failed|unauthorized|token/i.test(String(msg))) return true;
+  return false;
+}
+
+function clearSessionAndRedirect() {
+  try {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+  } catch (e) {
+    console.warn('Falha ao limpar localStorage:', e);
+  }
+  window.location.href = '/login';
+}
+
 // Adiciona o token de autenticação a cada requisição, se disponível
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
+  const token = normalizeToken(localStorage.getItem('token'));
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -21,14 +53,8 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response && error.response.status === 401) {
-      try {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-      } catch (e) {
-        console.warn('Falha ao limpar localStorage:', e);
-      }
-      window.location.href = '/login';
+    if (isAuthenticationFailure(error)) {
+      clearSessionAndRedirect();
     }
     return Promise.reject(error);
   },

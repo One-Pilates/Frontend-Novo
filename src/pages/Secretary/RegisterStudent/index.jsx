@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
-import { FaArrowLeft } from 'react-icons/fa';
+import { FaArrowLeft, FaUserGraduate } from 'react-icons/fa';
+import { FiArrowRight, FiArrowLeft as FiArrowLeftIcon, FiCheck } from 'react-icons/fi';
 import { toast } from 'sonner';
 import api from '../../../services/api';
 import StepIndicator from './components/StepIndicator';
-import Button from './components/Button';
 import DadosPessoaisScreen from './screens/DadosPessoais';
 import EnderecoScreen from './screens/Endereco';
 import InformacoesAlunoScreen from './screens/InformacoesAlunos';
@@ -24,6 +24,7 @@ export default function RegisterStudent() {
   const dadosIniciais = location.state || {};
 
   const [etapaAtual, setEtapaAtual] = useState(1);
+  const [carregando, setCarregando] = useState(false);
   const [erros, setErros] = useState({});
 
   const [dadosPessoais, setDadosPessoais] = useState(
@@ -254,6 +255,7 @@ export default function RegisterStudent() {
   };
 
   const cadastrarAluno = async () => {
+    setCarregando(true);
     const payload = {
       nome: dadosPessoais.nomeCompleto || '',
       email: dadosPessoais.email || '',
@@ -287,6 +289,8 @@ export default function RegisterStudent() {
     } catch (error) {
       console.error('Erro ao salvar aluno:', error);
       toast.error(isEditMode ? 'Não foi possível atualizar o aluno.' : 'Não foi possível cadastrar o aluno.');
+    } finally {
+      setCarregando(false);
     }
   };
 
@@ -323,9 +327,6 @@ export default function RegisterStudent() {
             dadosPessoais={dadosPessoais}
             endereco={endereco}
             informacoesAluno={informacoesAluno}
-            onVoltar={etapaAnterior}
-            onCancelar={cancelarCadastro}
-            onCadastrar={cadastrarAluno}
           />
         );
       default:
@@ -334,38 +335,54 @@ export default function RegisterStudent() {
   };
 
   return (
-    <div className="register-container">
-      <div className="register-header">
-        <button className="back-button" onClick={() => navigate(`${basePath}/alunos`)}>
-          <FaArrowLeft />
-          <span>Voltar</span>
-        </button>
-        <h1 className="main-title">{isEditMode ? 'Editar dados do aluno' : 'Preencha os dados para criar a conta'}</h1>
-      </div>
+    <div className="register-student-page">
+      <div className="register-container">
+        <div className="register-header">
+          <button className="back-button" onClick={() => navigate(`${basePath}/alunos`)}>
+            <FaArrowLeft size={13} />
+            <span>Voltar</span>
+          </button>
+          <div className="header-title-group">
+            <div className="header-icon" aria-hidden="true">
+              <FaUserGraduate size={18} />
+            </div>
+            <div>
+              <h1 className="main-title">{isEditMode ? 'Editar Aluno' : 'Cadastrar Aluno'}</h1>
+              <p className="main-subtitle">Preencha as informações abaixo</p>
+            </div>
+          </div>
+          <span className="header-step-badge">Etapa {etapaAtual} de {etapas.length}</span>
+        </div>
 
-      <div className="register-content">
-        <div className="register-card">
+        <div className="register-content">
           <StepIndicator steps={etapas} currentStep={etapaAtual} onStepClick={irParaEtapa} />
 
-          <form className="register-form" onSubmit={(e) => e.preventDefault()}>
-            {renderEtapa()}
+          <div className="register-card">
+            <form className="register-form" onSubmit={(e) => e.preventDefault()}>
+              {renderEtapa()}
+            </form>
 
-            {etapaAtual < 4 && (
-              <div className="button-group">
-                {etapaAtual > 1 && (
-                  <Button variant="secondary" onClick={etapaAnterior}>
-                    Voltar
-                  </Button>
-                )}
-
-                <Button variant="primary" onClick={proximaEtapa}>
-                  {etapaAtual === 3 ? (isEditMode ? 'Salvar' : 'Cadastrar') : 'Continuar'}
-                </Button>
-              </div>
-            )}
-
-            {/* Buttons for etapa 4 are rendered inside the Confirmacao screen */}
-          </form>
+            <div className="form-actions">
+              <button className="btn-cancel" onClick={cancelarCadastro} disabled={carregando}>
+                Cancelar
+              </button>
+              {etapaAtual > 1 && (
+                <button className="btn-back" onClick={etapaAnterior} disabled={carregando}>
+                  <FiArrowLeftIcon size={15} /> Voltar
+                </button>
+              )}
+              {etapaAtual < 4 && (
+                <button className="btn-next" onClick={proximaEtapa} disabled={carregando}>
+                  Próximo <FiArrowRight size={15} />
+                </button>
+              )}
+              {etapaAtual === 4 && (
+                <button className="btn-finish" onClick={cadastrarAluno} disabled={carregando}>
+                  {carregando ? '⏳ ' + (isEditMode ? 'Salvando...' : 'Cadastrando...') : <><FiCheck size={16} /> Confirmar e {isEditMode ? 'Salvar' : 'Cadastrar'}</>}
+                </button>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>

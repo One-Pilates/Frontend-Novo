@@ -1,5 +1,4 @@
 import { FaCheckCircle } from 'react-icons/fa';
-import Button from '../components/Button';
 import './confirmacao.scss';
 
 const CardInfo = ({ label, valor }) => (
@@ -14,9 +13,6 @@ export default function ConfirmacaoProfessorScreen({
   endereco = {},
   informacoesProfissionais = {},
   especialidades = [],
-  onCadastrar,
-  onCancelar,
-  onVoltar,
 }) {
   const especialidadesNomes =
     informacoesProfissionais.especialidades
@@ -25,10 +21,15 @@ export default function ConfirmacaoProfessorScreen({
       .join(', ') || 'Nenhuma';
 
   return (
-    <div className="confirmacao-aluno-screen">
-      <div className="success-section">
-        <h2 className="confirm-title">Revise os dados</h2>
-        <p className="confirm-message">Verifique se tudo está correto antes de cadastrar</p>
+    <div className="confirmacao-screen etapa-content">
+      <div className="etapa-header">
+        <div className="etapa-icon">
+          <FaCheckCircle size={20} />
+        </div>
+        <div className="etapa-title-group">
+          <h2>Revisão e Confirmação</h2>
+          <p>Verifique se tudo está correto antes de cadastrar</p>
+        </div>
       </div>
 
       <div className="data-sections">
@@ -79,29 +80,6 @@ export default function ConfirmacaoProfessorScreen({
               </span>
             </div>
           </div>
-        </div>
-      </div>
-
-      <div
-        className="button-group"
-        style={{
-          marginTop: '2rem',
-          display: 'flex',
-          gap: '1rem',
-          justifyContent: 'center',
-          flexWrap: 'wrap',
-        }}
-      >
-        <div className="confirm-actions">
-          <Button variant="tertiary" onClick={onVoltar}>
-            Voltar
-          </Button>
-          <Button variant="secondary" onClick={onCancelar}>
-            Cancelar
-          </Button>
-          <Button variant="primary" onClick={onCadastrar}>
-            Cadastrar
-          </Button>
         </div>
       </div>
     </div>

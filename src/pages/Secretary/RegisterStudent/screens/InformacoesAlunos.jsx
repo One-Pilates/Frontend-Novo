@@ -1,9 +1,19 @@
+import { FaClipboardList } from 'react-icons/fa';
 import Input from '../components/Input';
 import './informacoesAlunos.scss';
 
 export default function InformacoesAlunoScreen({ dados, atualizar, erros = {} }) {
   return (
-    <div className="informacoes-aluno-screen">
+    <div className="informacoes-aluno-screen etapa-content">
+      <div className="etapa-header">
+        <div className="etapa-icon">
+          <FaClipboardList size={18} />
+        </div>
+        <div className="etapa-title-group">
+          <h2>Informações do Aluno</h2>
+          <p>Dados de saúde e observações</p>
+        </div>
+      </div>
       <div className="aluno-content">
         <div className="checkbox-item">
           <label className="checkbox-toggle-label">

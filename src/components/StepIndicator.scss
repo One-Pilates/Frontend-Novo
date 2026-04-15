@@ -1,46 +1,55 @@
-.step-indicator {
+.op-step-indicator {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0;
-  margin-bottom: 2.5rem;
+  align-items: flex-start;
   width: 100%;
   max-width: 100%;
-  padding: 0 1rem;
+  margin-bottom: 2rem;
+  padding: 1.25rem 1.4rem 1rem;
+  border-radius: 20px;
+  background: #ffffff;
+  border: 1px solid var(--cor-borda);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.04),
+    0 10px 24px rgba(0, 0, 0, 0.05);
+  overflow-x: auto;
+  scrollbar-width: thin;
 }
 
-.step-wrapper {
+.op-step-wrapper {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   flex: 1;
+  min-width: 6.6rem;
 
   &:last-child {
     flex: 0;
+    min-width: auto;
   }
 }
 
-.step-item {
+.op-step-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.55rem;
+  width: 6.6rem;
   position: relative;
   z-index: 2;
 }
 
-.step-circle {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 50%;
+.op-step-circle {
+  width: 2.65rem;
+  height: 2.65rem;
+  border-radius: 999px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 600;
-  font-size: 0.875rem;
-  background-color: var(--cor-borda);
-  color: var(--text-cinza);
-  transition: all 0.3s ease;
-  border: none;
+  font-weight: 700;
+  font-size: 0.86rem;
+  background-color: #eceff3;
+  color: #8b95a5;
+  border: 1px solid #dde2ea;
+  transition: transform 0.22s ease, box-shadow 0.24s ease, background-color 0.24s ease;
   cursor: default;
   flex-shrink: 0;
 
@@ -48,70 +57,106 @@
     cursor: pointer;
 
     &:hover {
-      transform: scale(1.1);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 14px rgba(15, 23, 42, 0.12);
     }
   }
 
   &.active {
-    background-color: var(--laranja-principal);
-    color: var(--branco);
-    box-shadow: 0 0 0 4px rgba(255, 112, 67, 0.2);
+    background: #f77433;
+    border-color: transparent;
+    color: #ffffff;
+    box-shadow:
+      0 4px 12px rgba(247, 116, 51, 0.4);
   }
 
   &.completed {
-    background-color: #22c55e;
-    color: var(--branco);
+    background: #f28b4e;
+    border-color: transparent;
+    color: #ffffff;
+    box-shadow: 0 6px 12px rgba(247, 116, 51, 0.3);
   }
 
   &:disabled {
     cursor: not-allowed;
+    opacity: 0.88;
   }
 }
 
-.step-label {
-  font-size: 0.75rem;
-  color: var(--text-cinza);
-  font-weight: 500;
+.op-step-label {
+  font-size: 0.74rem;
+  color: #7c8798;
+  font-weight: 600;
   text-align: center;
-  white-space: nowrap;
-  transition: color 0.3s ease;
+  line-height: 1.2;
+  letter-spacing: 0.1px;
+  min-height: 2rem;
+  transition: color 0.25s ease;
 
   &.active {
-    color: var(--text-escuro);
-    font-weight: 600;
+    color: #1f2937;
   }
 }
 
-.step-line {
-  height: 2px;
+.op-step-line {
+  height: 3px;
   flex: 1;
-  background-color: var(--cor-borda);
-  margin: 0 1rem;
-  margin-bottom: 1.75rem;
+  min-width: 1.4rem;
+  background-color: #e5e9ef;
+  margin: 1.35rem 0.55rem 0;
+  border-radius: 999px;
   transition: background-color 0.3s ease;
 
   &.completed {
-    background-color: #22c55e;
+    background: #f4a179;
   }
 }
 
-@media (max-width: 768px) {
-  .step-indicator {
-    padding: 0 0.5rem;
+@media (max-width: 900px) {
+  .op-step-indicator {
+    padding: 1rem 1rem 0.8rem;
+    margin-bottom: 1.5rem;
   }
 
-  .step-label {
+  .op-step-item {
+    width: 5.9rem;
+  }
+
+  .op-step-wrapper {
+    min-width: 5.9rem;
+  }
+
+  .op-step-circle {
+    width: 2.3rem;
+    height: 2.3rem;
+    font-size: 0.78rem;
+  }
+
+  .op-step-label {
     font-size: 0.65rem;
   }
 
-  .step-circle {
-    width: 2rem;
-    height: 2rem;
-    font-size: 0.75rem;
+  .op-step-line {
+    margin-top: 1.15rem;
+  }
+}
+
+@media (max-width: 560px) {
+  .op-step-indicator {
+    gap: 0.1rem;
+    padding-bottom: 0.6rem;
   }
 
-  .step-line {
-    margin: 0 0.5rem;
-    margin-bottom: 1.5rem;
+  .op-step-item {
+    width: 4.5rem;
+  }
+
+  .op-step-wrapper {
+    min-width: 4.5rem;
+  }
+
+  .op-step-label {
+    font-size: 0.62rem;
+    min-height: 1.5rem;
   }
 }

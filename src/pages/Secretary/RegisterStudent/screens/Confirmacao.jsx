@@ -1,5 +1,5 @@
+import { FaCheckCircle } from 'react-icons/fa';
 import './confirmacao.scss';
-import Button from '../components/Button';
 
 const CardInfo = ({ label, valor }) => (
   <div className="card-info">
@@ -12,15 +12,17 @@ export default function ConfirmacaoAlunoScreen({
   dadosPessoais,
   endereco,
   informacoesAluno,
-  onVoltar,
-  onCancelar,
-  onCadastrar,
 }) {
   return (
-    <div className="confirmacao-aluno-screen">
-      <div className="confirm-header">
-        <h2 className="confirm-title">Revise os dados</h2>
-        <p className="confirm-message">Verifique se tudo está correto antes de cadastrar</p>
+    <div className="confirmacao-screen etapa-content">
+      <div className="etapa-header">
+        <div className="etapa-icon">
+          <FaCheckCircle size={20} />
+        </div>
+        <div className="etapa-title-group">
+          <h2>Revisão e Confirmação</h2>
+          <p>Verifique se tudo está correto antes de cadastrar</p>
+        </div>
       </div>
 
       <div className="data-sections">
@@ -69,18 +71,6 @@ export default function ConfirmacaoAlunoScreen({
             </div>
           </div>
         </div>
-      </div>
-
-      <div className="confirm-actions">
-        <Button variant="tertiary" onClick={onVoltar}>
-          Voltar
-        </Button>
-        <Button variant="secondary" onClick={onCancelar}>
-          Cancelar
-        </Button>
-        <Button variant="primary" onClick={onCadastrar}>
-          Cadastrar
-        </Button>
       </div>
     </div>
   );

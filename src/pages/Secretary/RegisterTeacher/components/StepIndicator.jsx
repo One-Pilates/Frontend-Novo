@@ -3,7 +3,7 @@ import './stepIndicator.scss';
 
 export default function StepIndicator({ steps, currentStep, onStepClick }) {
   return (
-    <div className="step-indicator">
+    <div className="op-step-indicator" role="list" aria-label="Progresso do formulário">
       {steps.map((step, index) => {
         const stepNumber = index + 1;
         const isActive = stepNumber === currentStep;
@@ -11,24 +11,27 @@ export default function StepIndicator({ steps, currentStep, onStepClick }) {
         const isClickable = stepNumber <= currentStep;
 
         return (
-          <div key={stepNumber} className="step-wrapper">
-            <div className="step-item">
+          <div key={stepNumber} className="op-step-wrapper" role="listitem">
+            <div className="op-step-item">
               <button
                 type="button"
-                className={`step-circle ${isActive ? 'active' : ''} ${
+                className={`op-step-circle ${isActive ? 'active' : ''} ${
                   isCompleted ? 'completed' : ''
                 } ${isClickable ? 'clickable' : ''}`}
                 onClick={() => isClickable && onStepClick(stepNumber)}
                 disabled={!isClickable}
+                aria-current={isActive ? 'step' : undefined}
+                aria-label={`Etapa ${stepNumber}: ${step.label}`}
+                title={step.label}
               >
-                {isCompleted ? <FaCheck size={16} /> : stepNumber}
+                {isCompleted ? <FaCheck size={14} /> : stepNumber}
               </button>
-              <span className={`step-label ${isActive || isCompleted ? 'active' : ''}`}>
+              <span className={`op-step-label ${isActive || isCompleted ? 'active' : ''}`}>
                 {step.label}
               </span>
             </div>
             {stepNumber < steps.length && (
-              <div className={`step-line ${isCompleted ? 'completed' : ''}`} />
+              <div className={`op-step-line ${isCompleted ? 'completed' : ''}`} />
             )}
           </div>
         );

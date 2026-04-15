@@ -1,95 +1,500 @@
+@use '../../../variables.scss' as *;
+
+.register-student-page {
+
+// ─── Container ────────────────────────────────────────────────────────────────
 .register-container {
-  width: 100%;
   min-height: 100vh;
-  padding: 2rem;
-}
-
-.register-header {
-  max-width: 64rem;
-  margin: 0 auto 2rem;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  position: relative;
-}
-
-.back-button {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: none;
-  border: none;
-  color: var(--text-cinza);
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: color 0.2s ease;
-  position: absolute;
-  left: 0;
-
-  &:hover {
-    color: var(--text-escuro);
-  }
-}
-
-.main-title {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--text-cinza);
-  text-align: center;
-  width: 100%;
-}
-
-.register-content {
-  max-width: 64rem;
-  margin: 0 auto;
-}
-
-.subtitle {
-  text-align: center;
-  color: var(--text-cinza);
-  font-size: 0.875rem;
-  margin-bottom: 2rem;
-}
-
-.register-form {
+  background: var(--bg-claro);
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  padding: 0 1rem;
 }
 
-.button-group {
+// ─── Hero Header bar (white card) ────────────────────────────────────────────
+.register-header {
+  max-width: 800px;
+  width: 100%;
+  margin: 1.2rem auto 0;
+  padding: 0.95rem 1.2rem;
+  background: var(--branco);
+  border: 1px solid var(--cor-borda);
+  border-radius: 16px;
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.04),
+    0 10px 24px rgba(0, 0, 0, 0.05);
   display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
-  padding-top: 1.5rem;
-  margin-top: 1rem;
-  > button:only-child {
-    margin-left: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+
+  .back-button {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    background: transparent;
+    border: 1px solid var(--cor-borda);
+    color: var(--text-escuro);
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.8rem;
+    transition: all 0.22s ease;
+    padding: 0.48rem 0.92rem;
+    border-radius: 30px;
+    flex-shrink: 0;
+
+    &:hover {
+      border-color: rgba($laranja-principal, 0.45);
+      color: $laranja-principal;
+      background: rgba($laranja-principal, 0.06);
+      transform: translateX(-2px);
+    }
+  }
+
+  .header-title-group {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+    justify-content: center;
+
+    .header-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, $laranja-principal, #ff8c42);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      flex-shrink: 0;
+      box-shadow: 0 4px 10px rgba($laranja-principal, 0.3);
+    }
+
+    .main-title {
+      margin: 0;
+      font-size: 1.2rem;
+      color: var(--text-escuro);
+      font-weight: 800;
+      letter-spacing: -0.2px;
+      line-height: 1.2;
+    }
+
+    .main-subtitle {
+      margin: 2px 0 0;
+      font-size: 0.72rem;
+      color: var(--text-cinza);
+    }
+  }
+
+  .header-step-badge {
+    background: rgba($laranja-principal, 0.1);
+    color: $laranja-principal;
+    border: 1px solid rgba($laranja-principal, 0.2);
+    border-radius: 20px;
+    padding: 0.3rem 0.8rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
 }
 
-.dados-pessoais-screen,
-.endereco-screen,
-.informacoes-profissionais-screen {
-  background: var(--branco);
-  padding: 2.5rem 3rem;
-  border-radius: 1rem;
-  border: 1px solid var(--cor-borda);
-  min-height: 400px;
+// ─── Content area ─────────────────────────────────────────────────────────────
+.register-content {
+  max-width: 800px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 1.25rem 0 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
 }
 
+// ─── Card ─────────────────────────────────────────────────────────────────────
+.register-card {
+  background: var(--branco);
+  border-radius: 18px;
+  padding: 2rem 2rem 0;
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.05),
+    0 8px 24px rgba(0, 0, 0, 0.07);
+  border: 1px solid var(--cor-borda);
+  overflow: hidden;
+}
+
+// Remove camada interna herdada.
+.register-container .register-card .dados-pessoais-screen,
+.register-container .register-card .endereco-screen,
+.register-container .register-card .informacoes-profissionais-screen,
+.register-container .register-card .confirmacao-aluno-screen,
+.register-container .register-card .confirmacao-screen {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+  min-height: auto;
+}
+
+// ─── Form animation ───────────────────────────────────────────────────────────
+.register-form {
+  animation: slideIn 0.3s cubic-bezier(0.34, 1.2, 0.64, 1);
+}
+
+// ─── Step header inside each etapa ────────────────────────────────────────────
+.etapa-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
+  .etapa-header {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1.5px solid var(--cor-borda);
+
+    .etapa-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 11px;
+      background: linear-gradient(135deg, $laranja-principal, #ff8c42);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      flex-shrink: 0;
+      box-shadow: 0 4px 10px rgba($laranja-principal, 0.35);
+    }
+
+    .etapa-title-group {
+      h2 {
+        font-size: 1.1rem;
+        color: var(--text-escuro);
+        margin: 0 0 2px;
+        font-weight: 700;
+      }
+
+      p {
+        font-size: 0.78rem;
+        color: var(--text-cinza);
+        margin: 0;
+      }
+    }
+  }
+}
+
+// ─── Layout helpers ───────────────────────────────────────────────────────────
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+
+  @media (max-width: 560px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ─── Form Group ───────────────────────────────────────────────────────────────
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+
+  label {
+    font-weight: 600;
+    color: var(--text-escuro);
+    font-size: 0.8rem;
+    letter-spacing: 0.15px;
+
+    .required {
+      color: $laranja-principal;
+      margin-left: 2px;
+    }
+  }
+
+  input[type='date'],
+  input[type='time'],
+  input[type='text'],
+  input[type='email'],
+  input[type='tel'],
+  select,
+  .search-input {
+    padding: 0.75rem 1rem;
+    border: 1.5px solid var(--cor-borda);
+    border-radius: 10px;
+    font-size: 0.875rem;
+    font-family: inherit;
+    background: var(--branco);
+    color: var(--text-escuro);
+    transition: all 0.18s ease;
+    -webkit-appearance: none;
+    appearance: none;
+
+    &:focus {
+      outline: none;
+      border-color: $laranja-principal;
+      box-shadow: 0 0 0 3px rgba($laranja-principal, 0.12);
+    }
+
+    &.input-error {
+      border-color: #ef4444;
+      background: rgba(239, 68, 68, 0.03);
+    }
+
+    &.input-disabled-warning {
+      border-color: #fca5a5;
+      background: rgba(254, 226, 226, 0.4);
+      color: #b91c1c;
+      cursor: not-allowed;
+    }
+
+    &:disabled {
+      background: var(--bg-claro);
+      cursor: not-allowed;
+      opacity: 0.65;
+    }
+  }
+
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23757575' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.875rem center;
+    padding-right: 2.5rem;
+  }
+
+  .error-message {
+    color: #ef4444;
+    font-size: 0.73rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    &::before {
+      content: '⚠';
+      font-size: 0.68rem;
+    }
+  }
+}
+
+// ─── Form Actions footer (inside card) ───────────────────────────────────────
+.form-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 1.5rem 2rem;
+  margin: 1.5rem -2rem 0;
+  background: var(--bg-claro);
+  border-top: 1px solid var(--cor-borda);
+}
+
+// ─── Buttons ──────────────────────────────────────────────────────────────────
+.btn-cancel {
+  padding: 0.62rem 1.2rem;
+  background: transparent;
+  color: var(--text-cinza);
+  border: 1.5px solid var(--cor-borda);
+  border-radius: 9px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+
+  &:hover:not(:disabled) {
+    border-color: #bbb;
+    color: var(--text-escuro);
+    background: var(--bg-claro);
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+}
+
+.btn-back {
+  padding: 0.62rem 1.2rem;
+  background: var(--branco);
+  color: var(--text-escuro);
+  border: 1.5px solid var(--cor-borda);
+  border-radius: 9px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+
+  &:hover:not(:disabled) {
+    border-color: $laranja-principal;
+    color: $laranja-principal;
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+}
+
+.btn-next {
+  padding: 0.62rem 1.5rem;
+  background: linear-gradient(135deg, $laranja-principal, #ff8c42);
+  color: white;
+  border: none;
+  border-radius: 9px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 3px 12px rgba($laranja-principal, 0.32);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 16px rgba($laranja-principal, 0.42);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    background: #d4d4d4;
+    color: #999;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+}
+
+.btn-finish {
+  padding: 0.62rem 1.5rem;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  border: none;
+  border-radius: 9px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 3px 12px rgba(16, 185, 129, 0.32);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 16px rgba(16, 185, 129, 0.45);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    background: #d4d4d4;
+    color: #999;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+}
+
+// ─── Animations ───────────────────────────────────────────────────────────────
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ─── Responsive ───────────────────────────────────────────────────────────────
+@media (max-width: 768px) {
+  .register-header {
+    margin-top: 0.85rem;
+    padding: 0.85rem 1rem;
+  }
+
+  .register-content {
+    padding: 1rem 0 2.5rem;
+  }
+
+  .register-card {
+    padding: 1.5rem 1.25rem 0;
+  }
+
+  .form-actions {
+    padding: 0.875rem 1.25rem;
+    margin: 1.25rem -1.25rem 0;
+    justify-content: stretch;
+
+    .btn-cancel,
+    .btn-back,
+    .btn-next,
+    .btn-finish {
+      flex: 1;
+      justify-content: center;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .register-header {
+    margin-top: 0.7rem;
+    padding: 0.8rem 0.9rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .register-content {
+    padding: 1rem 0 2rem;
+  }
+
+  .register-card {
+    padding: 1.25rem 1rem 0;
+    border-radius: 14px;
+  }
+
+  .form-actions {
+    flex-direction: column;
+    padding: 0.875rem 1rem;
+    margin: 1.25rem -1rem 0;
+
+    .btn-cancel,
+    .btn-back,
+    .btn-next,
+    .btn-finish {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+}
+
+// ─── Swal2 Customization ──────────────────────────────────────────────────────
 .swal2-confirm {
-  background-color: #f77433 !important;
+  background-color: $laranja-principal !important;
   color: white !important;
   font-weight: 600 !important;
   border-radius: 8px !important;
   padding: 10px 22px !important;
   border: none !important;
   box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.25) !important;
-}
 
-.swal2-confirm:hover {
-  background-color: #e8643d !important;
+  &:hover {
+    background-color: #e8643d !important;
+  }
 }
 
 .swal2-cancel {
@@ -97,10 +502,10 @@
   color: var(--branco) !important;
   border-radius: 8px !important;
   padding: 10px 22px !important;
-}
 
-.swal2-cancel:hover {
-  background-color: #9a9a9a !important;
+  &:hover {
+    background-color: #9a9a9a !important;
+  }
 }
 
 .swal2-popup {
@@ -108,62 +513,4 @@
   padding: 20px !important;
 }
 
-@media (max-width: 768px) {
-  .register-container {
-    padding: 1rem;
-  }
-
-  .register-header {
-    flex-direction: column;
-    align-items: flex-start;
-
-    .back-button {
-      position: static;
-      margin-bottom: 0.5rem;
-    }
-
-    .main-title {
-      font-size: 1.25rem;
-      text-align: left;
-    }
-  }
-
-  .register-card {
-    padding: 1.5rem;
-  }
-
-  .dados-pessoais-screen,
-  .endereco-screen,
-  .informacoes-profissionais-screen {
-    padding: 1.5rem;
-    min-height: auto;
-  }
-
-  .button-group {
-    flex-direction: column-reverse;
-
-    > button {
-      width: 100%;
-    }
-  }
-}
-
-@media (min-width: 1024px) {
-  .register-content {
-    max-width: 72rem;
-  }
-
-  .register-header {
-    max-width: 72rem;
-  }
-
-  .register-card {
-    padding: 3rem 4rem;
-  }
-
-  .dados-pessoais-screen,
-  .endereco-screen,
-  .informacoes-profissionais-screen {
-    padding: 3rem 4rem;
-  }
 }

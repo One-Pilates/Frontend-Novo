@@ -1,3 +1,4 @@
+import { FaBriefcase } from 'react-icons/fa';
 import Input from '../components/Input';
 import './informacoesProfissionais.scss';
 
@@ -17,7 +18,16 @@ export default function InformacoesProfissionaisScreen({
   };
 
   return (
-    <div className="informacoes-profissionais-screen">
+    <div className="informacoes-profissionais-screen etapa-content">
+      <div className="etapa-header">
+        <div className="etapa-icon">
+          <FaBriefcase size={17} />
+        </div>
+        <div className="etapa-title-group">
+          <h2>Informações Profissionais</h2>
+          <p>Cargo, especialidades e configurações</p>
+        </div>
+      </div>
       <div className="professional-content">
         <Input
           label="Cargo"

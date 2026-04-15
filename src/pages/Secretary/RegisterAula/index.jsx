@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../../hooks/useAuth';
-import { FaArrowLeft } from 'react-icons/fa';
+import { FiArrowRight, FiArrowLeft as FiArrowLeftIcon, FiCheck, FiCalendar } from 'react-icons/fi';
 import { toast } from 'sonner';
 import Swal from 'sweetalert2';
 import api from '../../../services/api';
@@ -45,6 +45,27 @@ export default function RegisterAula() {
     { label: 'Confirmação' },
   ];
 
+  const normalizarAluno = (aluno) => {
+    const id = aluno?.id ?? aluno?.idAluno ?? aluno?.alunoId ?? null;
+    const nome = aluno?.nome ?? aluno?.nomeCompleto ?? aluno?.alunoNome ?? '';
+
+    return {
+      ...aluno,
+      id,
+      nome,
+      alunoComLimitacoesFisicas: aluno?.alunoComLimitacoesFisicas ?? false,
+    };
+  };
+
+  const extrairLista = (payload) => {
+    if (Array.isArray(payload)) return payload;
+    if (Array.isArray(payload?.content)) return payload.content;
+    if (Array.isArray(payload?.alunos)) return payload.alunos;
+    if (Array.isArray(payload?.data)) return payload.data;
+    if (Array.isArray(payload?.results)) return payload.results;
+    return [];
+  };
+
   useEffect(() => {
     const carregarDados = async () => {
       try {
@@ -55,10 +76,15 @@ export default function RegisterAula() {
           api.get('/api/alunos'),
         ]);
 
-        setProfessores(profRes.data || []);
-        setSalas(salaRes.data || []);
-        setEspecialidades(espRes.data || []);
-        setTodosAlunos(alunoRes.data || []);
+        setProfessores(extrairLista(profRes.data));
+        setSalas(extrairLista(salaRes.data));
+        setEspecialidades(extrairLista(espRes.data));
+        const alunosRaw = extrairLista(alunoRes.data);
+        const alunosNormalizados = alunosRaw
+          .map(normalizarAluno)
+          .filter((aluno) => aluno.id !== null && aluno.nome);
+
+        setTodosAlunos(alunosNormalizados);
       } catch (error) {
         console.error('Erro ao carregar dados:', error);
         toast.error('Não foi possível carregar os dados. Tente novamente.');
@@ -128,8 +154,10 @@ export default function RegisterAula() {
   };
 
   const handleAdicionarAluno = (aluno) => {
-    if (aluno && !alunos.find((a) => a.id === aluno.id)) {
-      setAlunos([...alunos, aluno]);
+    const alunoNormalizado = normalizarAluno(aluno);
+
+    if (alunoNormalizado.id !== null && !alunos.find((a) => a.id === alunoNormalizado.id)) {
+      setAlunos([...alunos, alunoNormalizado]);
       setSearchAluno('');
       setMostrarListaAlunos(false);
     }
@@ -139,7 +167,9 @@ export default function RegisterAula() {
     setAlunos(alunos.filter((a) => a.id !== alunoId));
   };
 
-  const alunosDisponiveis = todosAlunos.filter((aluno) => !alunos.find((a) => a.id === aluno.id));
+  const alunosDisponiveis = Array.isArray(todosAlunos)
+    ? todosAlunos.filter((aluno) => !alunos.find((a) => a.id === aluno.id))
+    : [];
 
   const proximaEtapa = () => {
     if (validarEtapa()) {
@@ -174,13 +204,31 @@ export default function RegisterAula() {
 
     try {
       const dataHoraString = `${dataHora.data}T${dataHora.horario}:00`;
+      const professorId = Number(professor);
+      const salaId = Number(sala);
+      const especialidadeId = Number(especialidade);
+      const alunoIds = alunos
+        .map((a) => Number(a.id))
+        .filter((id) => Number.isFinite(id) && id > 0);
+
+      const payloadInvalido =
+        !Number.isFinite(professorId) ||
+        !Number.isFinite(salaId) ||
+        !Number.isFinite(especialidadeId) ||
+        alunoIds.length === 0;
+
+      if (payloadInvalido) {
+        toast.error('Dados da aula inválidos. Revise professor, sala, especialidade e alunos.');
+        setCarregando(false);
+        return;
+      }
 
       const payload = {
         dataHora: dataHoraString,
-        professorId: parseInt(professor),
-        salaId: parseInt(sala),
-        especialidadeId: parseInt(especialidade),
-        alunoIds: alunos.map((a) => a.id),
+        professorId,
+        salaId,
+        especialidadeId,
+        alunoIds,
       };
 
       await api.post('/api/agendamentos', payload);
@@ -189,8 +237,8 @@ export default function RegisterAula() {
 
       navigate(`${basePath}/agendamento`, {
         state: {
-          idProfessor: parseInt(professor),
-          idSala: parseInt(sala),
+          idProfessor: professorId,
+          idSala: salaId,
           autoCarregar: true,
         },
       });
@@ -206,6 +254,13 @@ export default function RegisterAula() {
         mensagem = error.response.data.message;
       } else if (error.response?.data) {
         mensagem = JSON.stringify(error.response.data);
+      }
+
+      if (mensagem === 'Authentication failed') {
+        toast.error('Sua sessão expirou. Faça login novamente.');
+        setCarregando(false);
+        navigate('/login');
+        return;
       }
 
       toast.error(mensagem);
@@ -283,13 +338,22 @@ export default function RegisterAula() {
   };
 
   return (
-    <div className="register-container">
+    <div className="register-container register-aula-page">
       <div className="register-header">
         <button className="back-button" onClick={() => navigate(`${basePath}/agendamento`)}>
-          <FaArrowLeft />
+          <FiArrowLeftIcon size={14} />
           <span>Voltar</span>
         </button>
-        <h1 className="main-title">Criar Nova Aula</h1>
+        <div className="header-title-group">
+          <div className="header-icon" aria-hidden="true">
+            <FiCalendar size={20} />
+          </div>
+          <div>
+            <h1 className="main-title">Criar Nova Aula</h1>
+            <p className="main-subtitle">Preencha as informações abaixo</p>
+          </div>
+        </div>
+        <span className="header-step-badge">Etapa {etapaAtual} de {etapas.length}</span>
       </div>
 
       <div className="register-content">
@@ -299,27 +363,27 @@ export default function RegisterAula() {
           <form className="register-form" onSubmit={(e) => e.preventDefault()}>
             {renderEtapa()}
           </form>
-        </div>
 
-        <div className="form-actions">
-          <button className="btn-cancel" onClick={cancelar} disabled={carregando}>
-            Cancelar
-          </button>
-          {etapaAtual > 1 && (
-            <button className="btn-back" onClick={etapaAnterior} disabled={carregando}>
-              Voltar
+          <div className="form-actions">
+            <button className="btn-cancel" onClick={cancelar} disabled={carregando}>
+              Cancelar
             </button>
-          )}
-          {etapaAtual < 4 && (
-            <button className="btn-next" onClick={proximaEtapa} disabled={carregando}>
-              Próximo
-            </button>
-          )}
-          {etapaAtual === 4 && (
-            <button className="btn-finish" onClick={criarAula} disabled={carregando}>
-              {carregando ? '⏳ Criando...' : 'Confirmar e Criar'}
-            </button>
-          )}
+            {etapaAtual > 1 && (
+              <button className="btn-back" onClick={etapaAnterior} disabled={carregando}>
+                <FiArrowLeftIcon size={15} /> Voltar
+              </button>
+            )}
+            {etapaAtual < 4 && (
+              <button className="btn-next" onClick={proximaEtapa} disabled={carregando}>
+                Próximo <FiArrowRight size={15} />
+              </button>
+            )}
+            {etapaAtual === 4 && (
+              <button className="btn-finish" onClick={criarAula} disabled={carregando}>
+                {carregando ? '⏳ Criando...' : <><FiCheck size={16} /> Confirmar e Criar</>}
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>

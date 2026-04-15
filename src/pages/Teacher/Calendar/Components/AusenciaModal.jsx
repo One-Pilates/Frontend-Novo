@@ -8,10 +8,14 @@ import '../Styles/Modal.scss';
 const AusenciaModal = ({ isOpen, ausencia, onClose, onDelete }) => {
   if (!isOpen || !ausencia) return null;
 
-  const formatDate = (dateStr) => {
+  const formatDateTime = (dateStr) => {
     if (!dateStr) return '—';
+    // Trata string "2025-04-10T08:00:00" ou com Z
     const d = new Date(dateStr);
-    return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    if (isNaN(d.getTime())) return dateStr;
+    const data = d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const hora = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    return `${data} às ${hora}`;
   };
 
   const handleDelete = async () => {
@@ -69,14 +73,14 @@ const AusenciaModal = ({ isOpen, ausencia, onClose, onDelete }) => {
                   <FiCalendar size={14} style={{ marginRight: '4px' }} />
                   Data início:
                 </span>
-                <span className="info-value">{formatDate(ausencia.dataInicio)}</span>
+                <span className="info-value">{formatDateTime(ausencia.dataInicio)}</span>
               </div>
               <div className="info-item">
                 <span className="info-label">
                   <FiClock size={14} style={{ marginRight: '4px' }} />
                   Data fim:
                 </span>
-                <span className="info-value">{formatDate(ausencia.dataFim)}</span>
+                <span className="info-value">{formatDateTime(ausencia.dataFim)}</span>
               </div>
             </div>
           </div>
@@ -88,9 +92,14 @@ const AusenciaModal = ({ isOpen, ausencia, onClose, onDelete }) => {
             <button
               className="btn-save"
               onClick={handleDelete}
-              style={{ backgroundColor: '#d33' }}
+              style={{
+                backgroundColor: '#d33',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}
             >
-              <FiTrash2 size={16} style={{ marginRight: '4px' }} />
+              <FiTrash2 size={16} />
               Excluir Ausência
             </button>
           </div>

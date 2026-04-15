@@ -37,7 +37,10 @@ const AgendamentoModal = ({ isOpen, agendamento, onClose, onDelete }) => {
     if (activeTab === 'alunos' && todosAlunos.length === 0) {
       api
         .get('/api/alunos')
-        .then((res) => setTodosAlunos(res.data || []))
+        .then((res) => {
+          const data = res.data;
+          setTodosAlunos(Array.isArray(data) ? data : (data?.content ?? []));
+        })
         .catch((err) => console.error('Erro ao carregar alunos:', err));
     }
   }, [activeTab, todosAlunos.length]);
@@ -234,9 +237,9 @@ const AgendamentoModal = ({ isOpen, agendamento, onClose, onDelete }) => {
     setMostrarListaAlunos(false);
   };
 
-  const alunosDisponiveis = todosAlunos.filter(
-    (aluno) => !alunosSelecionados.find((a) => a.id === aluno.id),
-  );
+  const alunosDisponiveis = Array.isArray(todosAlunos)
+    ? todosAlunos.filter((aluno) => !alunosSelecionados.find((a) => a.id === aluno.id))
+    : [];
 
   const alunosMudaram =
     (agendamento.alunos?.length || 0) !== alunosSelecionados.length ||

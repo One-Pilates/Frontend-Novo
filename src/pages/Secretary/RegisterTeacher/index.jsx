@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaArrowLeft } from 'react-icons/fa';
+import { FaArrowLeft, FaChalkboardTeacher } from 'react-icons/fa';
+import { FiArrowRight, FiArrowLeft as FiArrowLeftIcon, FiCheck } from 'react-icons/fi';
 import api from '../../../services/api';
 import { useAuth } from '../../../hooks/useAuth';
 import { toast } from 'sonner';
 import Swal from 'sweetalert2';
 import StepIndicator from './components/StepIndicator';
-import Button from './components/Button';
 import DadosPessoaisScreen from './screens/DadosPessoais';
 import EnderecoScreen from './screens/Endereco';
 import InformacoesProfissionaisScreen from './screens/InformacoesProfissionais';
@@ -509,10 +509,6 @@ export default function RegisterTeacher() {
             endereco={endereco}
             informacoesProfissionais={informacoesProfissionais}
             especialidades={especialidades}
-            cadastrando={cadastrando}
-            onCadastrar={cadastrarProfessor}
-            onVoltar={voltarEtapa}
-            onCancelar={cancelarCadastro}
           />
         );
       default:
@@ -521,35 +517,54 @@ export default function RegisterTeacher() {
   };
 
   return (
-    <div className="register-container">
-      <div className="register-header">
-        <button className="back-button" onClick={() => navigate(`${basePath}/professor`)}>
-          <FaArrowLeft />
-          <span>Voltar</span>
-        </button>
-        <h1 className="main-title">Preencha os dados para criar a conta</h1>
-      </div>
+    <div className="register-teacher-page">
+      <div className="register-container">
+        <div className="register-header">
+          <button className="back-button" onClick={() => navigate(`${basePath}/professor`)}>
+            <FaArrowLeft size={13} />
+            <span>Voltar</span>
+          </button>
+          <div className="header-title-group">
+            <div className="header-icon" aria-hidden="true">
+              <FaChalkboardTeacher size={19} />
+            </div>
+            <div>
+              <h1 className="main-title">Cadastrar Professor</h1>
+              <p className="main-subtitle">Preencha as informações abaixo</p>
+            </div>
+          </div>
+          <span className="header-step-badge">Etapa {etapaAtual} de {etapas.length}</span>
+        </div>
 
-      <div className="register-content">
-        <div className="register-card">
+        <div className="register-content">
           <StepIndicator steps={etapas} currentStep={etapaAtual} onStepClick={irParaEtapa} />
 
-          <form className="register-form" onSubmit={(e) => e.preventDefault()}>
-            {renderEtapa()}
+          <div className="register-card">
+            <form className="register-form" onSubmit={(e) => e.preventDefault()}>
+              {renderEtapa()}
+            </form>
 
-            {etapaAtual < 4 && (
-              <div className="button-group">
-                {etapaAtual > 1 && (
-                  <Button variant="secondary" onClick={etapaAnterior}>
-                    Voltar
-                  </Button>
-                )}
-                <Button variant="primary" onClick={proximaEtapa}>
-                  {etapaAtual === 3 ? 'Revisar' : 'Continuar'}
-                </Button>
-              </div>
-            )}
-          </form>
+            <div className="form-actions">
+              <button className="btn-cancel" onClick={cancelarCadastro} disabled={cadastrando}>
+                Cancelar
+              </button>
+              {etapaAtual > 1 && (
+                <button className="btn-back" onClick={etapaAnterior} disabled={cadastrando}>
+                  <FiArrowLeftIcon size={15} /> Voltar
+                </button>
+              )}
+              {etapaAtual < 4 && (
+                <button className="btn-next" onClick={proximaEtapa} disabled={cadastrando}>
+                  Próximo <FiArrowRight size={15} />
+                </button>
+              )}
+              {etapaAtual === 4 && (
+                <button className="btn-finish" onClick={cadastrarProfessor} disabled={cadastrando}>
+                  {cadastrando ? '⏳ Cadastrando...' : <><FiCheck size={16} /> Confirmar e Cadastrar</>}
+                </button>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>
