@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../hooks/useAuth';
 import api from '../../../services/api';
@@ -15,23 +15,67 @@ export default function GerenciamentoProfessor() {
   const basePath = user?.role === 'ADMINISTRADOR' ? '/admin' : '/secretaria';
   const [professores, setProfessores] = useState([]);
   const [professoresOriginais, setProfessoresOriginais] = useState([]);
+  const [paginaAtual, setPaginaAtual] = useState(1);
+  const [carregandoMais, setCarregandoMais] = useState(false);
+  const [temMaisProfessores, setTemMaisProfessores] = useState(true);
+  const [termoBusca, setTermoBusca] = useState('');
+  const professoresPage = 5;
 
-  const fetchProfessores = async () => {
-    try {
-      console.log('Buscando professores...');
-      const response = await api.get('api/professores');
-      const data = response.data;
-      console.log('Professores recebidosUseEffect:', data);
-      setProfessores(data);
-      setProfessoresOriginais(data);
-    } catch (error) {
-      console.error('Erro ao buscar professores:', error);
-    }
-  };
+  const fetchProfessores = useCallback(
+    async (page = 1, append = false, nome = '') => {
+      const pageIndex = Math.max(0, page - 1);
+      const nomeLimpo = nome.trim();
+      const params = {
+        page: pageIndex,
+        size: professoresPage,
+        sort: 'id,asc',
+        ...(nomeLimpo ? { nome: nomeLimpo } : {}),
+      };
+
+      if (append) {
+        setCarregandoMais(true);
+      }
+
+      try {
+        console.log('Buscando professores...');
+        const response = await api.get('api/professores', { params });
+        const data = response.data;
+        const listaProfessores = Array.isArray(data)
+          ? data
+          : Array.isArray(data?.professores)
+            ? data.professores
+            : [];
+
+        console.log('Professores recebidosUseEffect:', data);
+        setProfessoresOriginais((listaAnterior) => {
+          const listaAtualizada = append
+            ? [...listaAnterior, ...listaProfessores]
+            : listaProfessores;
+          setProfessores(listaAtualizada);
+          return listaAtualizada;
+        });
+
+        setPaginaAtual(page);
+        setTemMaisProfessores(listaProfessores.length === professoresPage);
+      } catch (error) {
+        console.error('Erro ao buscar professores:', error);
+      } finally {
+        if (append) {
+          setCarregandoMais(false);
+        }
+      }
+    },
+    [professoresPage],
+  );
 
   useEffect(() => {
-    fetchProfessores();
-  }, []);
+    const timeoutId = setTimeout(() => {
+      setTemMaisProfessores(true);
+      fetchProfessores(1, false, termoBusca);
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [fetchProfessores, termoBusca]);
 
   const deletarProfessor = async (professorId) => {
     Swal.fire({
@@ -48,7 +92,8 @@ export default function GerenciamentoProfessor() {
         try {
           const response = await api.delete(`api/professores/${professorId}`);
           console.log('Professor deletado:', response.data);
-          fetchProfessores();
+          setTemMaisProfessores(true);
+          fetchProfessores(1, false, termoBusca);
           toast.success('Professor deletado com sucesso.');
         } catch (error) {
           console.error('Erro ao deletar professor:', error);
@@ -59,18 +104,15 @@ export default function GerenciamentoProfessor() {
   };
 
   const filterByNome = (event) => {
-    const name = event.target.value.trim();
+    const name = event.target.value;
+    setTermoBusca(name);
+  };
 
-    if (!name) {
-      setProfessores(professoresOriginais);
+  const handleVerMais = () => {
+    if (carregandoMais || !temMaisProfessores) {
       return;
     }
-
-    const filtrados = professoresOriginais.filter((professor) =>
-      professor.nome.toLowerCase().includes(name.toLowerCase()),
-    );
-
-    setProfessores(filtrados);
+    fetchProfessores(paginaAtual + 1, true, termoBusca);
   };
 
   return (
@@ -272,6 +314,19 @@ export default function GerenciamentoProfessor() {
               style={{ color: 'var(--text-cinza)' }}
             >
               Nenhum professor encontrado
+            </div>
+          )}
+
+          {professoresOriginais.length > 0 && temMaisProfessores && (
+            <div className="flex justify-center mt-2">
+              <button
+                onClick={handleVerMais}
+                disabled={carregandoMais}
+                className="px-16 py-4 rounded-lg font-semibold text-white transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                style={{ backgroundColor: 'var(--laranja-principal)' }}
+              >
+                {carregandoMais ? 'Carregando...' : 'Ver mais'}
+              </button>
             </div>
           )}
         </div>
