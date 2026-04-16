@@ -245,9 +245,7 @@ const AgendamentoModal = ({ isOpen, agendamento, onClose, onDelete }) => {
     (agendamento.alunos?.length || 0) !== alunosSelecionados.length ||
     !agendamento.alunos?.every((a) => alunosSelecionados.find((s) => s.id === a.id));
 
-  const editFieldsWithoutObs = Object.keys(editFields).filter(
-    (k) => !k.startsWith('observacao_'),
-  );
+  const editFieldsWithoutObs = Object.keys(editFields).filter((k) => !k.startsWith('observacao_'));
   const temMudancas = editFieldsWithoutObs.length > 0 || alunosMudaram;
 
   if (!isOpen || !agendamento) return null;
@@ -579,7 +577,10 @@ const AgendamentoModal = ({ isOpen, agendamento, onClose, onDelete }) => {
                           borderRadius: '8px',
                         }}
                       >
-                        <div className="aluno-item-wrapper" style={{ marginBottom: expandido ? '0.5rem' : 0 }}>
+                        <div
+                          className="aluno-item-wrapper"
+                          style={{ marginBottom: expandido ? '0.5rem' : 0 }}
+                        >
                           <AlunoItem
                             nome={aluno.nome}
                             alunoComLimitacoesFisicas={aluno.alunoComLimitacoesFisicas}
@@ -629,7 +630,9 @@ const AgendamentoModal = ({ isOpen, agendamento, onClose, onDelete }) => {
                                   placeholder="Observação sobre este aluno nesta aula..."
                                   style={{ width: '100%', borderColor: modalColor }}
                                 />
-                                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+                                <div
+                                  style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}
+                                >
                                   <button
                                     className="icon-btn"
                                     onClick={() =>
@@ -655,7 +658,9 @@ const AgendamentoModal = ({ isOpen, agendamento, onClose, onDelete }) => {
                                 </div>
                               </div>
                             ) : (
-                              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem' }}>
+                              <div
+                                style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem' }}
+                              >
                                 <span className="info-value" style={{ flex: 1 }}>
                                   {observacaoAtual && observacaoAtual.trim() !== ''
                                     ? observacaoAtual
@@ -688,7 +693,7 @@ const AgendamentoModal = ({ isOpen, agendamento, onClose, onDelete }) => {
                 </p>
               )}
 
-              {(alunosMudaram) && (
+              {alunosMudaram && (
                 <div className="edit-actions">
                   <button className="btn-cancel" onClick={handleCancel} disabled={carregando}>
                     Cancelar
