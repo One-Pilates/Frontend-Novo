@@ -115,6 +115,7 @@ const Calendar = () => {
     const isMobile = window.innerWidth < 768;
     const calendar = new window.FullCalendar.Calendar(calendarRef.current, {
       initialView: isMobile ? 'timeGridDay' : 'timeGridWeek',
+      weekends: false,
       locale: 'pt-br',
       height: 'auto',
       slotMinTime: '07:00:00',

@@ -181,6 +181,7 @@ export default function CalendarSecretary() {
 
     const calendar = new window.FullCalendar.Calendar(calendarRef.current, {
       initialView: currentViewRef.current || 'timeGridWeek',
+      weekends: false,
       locale: 'pt-br',
       height: 'auto',
       slotMinTime: '07:00:00',

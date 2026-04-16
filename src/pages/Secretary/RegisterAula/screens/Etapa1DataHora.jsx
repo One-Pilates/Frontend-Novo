@@ -1,9 +1,22 @@
 import React from 'react';
 import { FiCalendar, FiClock } from 'react-icons/fi';
+import { toast } from 'sonner';
 
 export default function Etapa1DataHora({ dataHora, setDataHora, erros }) {
   const handleDataChange = (e) => {
-    setDataHora((prev) => ({ ...prev, data: e.target.value }));
+    const selectedDateStr = e.target.value;
+    if (selectedDateStr) {
+      const [ano, mes, dia] = selectedDateStr.split('-');
+      const dataObj = new Date(ano, mes - 1, dia);
+      const diaDaSemana = dataObj.getDay();
+      
+      if (diaDaSemana === 0 || diaDaSemana === 6) {
+        toast.warning('Aulas não podem ser agendadas aos sábados e domingos.');
+        setDataHora((prev) => ({ ...prev, data: '' }));
+        return;
+      }
+    }
+    setDataHora((prev) => ({ ...prev, data: selectedDateStr }));
   };
 
   const handleHorarioChange = (e) => {
