@@ -362,16 +362,18 @@
     z-index: 3;
     pointer-events: none;
 
-    span {
+    &-link {
       color: rgba(255, 255, 255, 0.9);
       font-weight: 600;
       text-decoration: underline;
       text-underline-offset: 2px;
       cursor: pointer;
       pointer-events: all;
+      transition: all 0.2s ease;
 
       &:hover {
         color: #fff;
+        text-underline-offset: 4px;
       }
     }
   }

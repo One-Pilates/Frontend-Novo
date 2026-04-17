@@ -3,7 +3,7 @@ import { validacaoEmail } from '../../utils/utils';
 import { useAuth } from '../../hooks/useAuth';
 import './Login.scss';
 import { toast } from 'sonner';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import BackgroundLogin from '../../components/BackgroundLogin';
 
@@ -113,9 +113,11 @@ export default function Login() {
 
       <BackgroundLogin />
 
+
       <p className="login__terms">
-        Ao continuar, você concorda com nossos <span>Termos de Uso</span> e{' '}
-        <span>Política de Privacidade</span>.
+        Ao continuar, você concorda com nossos{' '}
+        <Link to="/termos-de-uso" className="login__terms-link">Termos de Uso</Link> e{' '}
+        <Link to="/politica-de-privacidade" className="login__terms-link">Política de Privacidade</Link>.
       </p>
     </div>
   );

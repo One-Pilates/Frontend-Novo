@@ -231,21 +231,19 @@ export default function StudioView() {
       <div className="flex gap-4 border-b-2 border-slate-100/60 pb-1">
         <button
           onClick={() => setActiveTab('especialidades')}
-          className={`px-6 py-4 text-base font-bold transition-all duration-300 border-b-4 -mb-[2px] ${
-            activeTab === 'especialidades'
+          className={`px-6 py-4 text-base font-bold transition-all duration-300 border-b-4 -mb-[2px] ${activeTab === 'especialidades'
               ? 'border-orange-500 text-orange-600'
               : 'border-transparent text-slate-400 hover:text-slate-600'
-          }`}
+            }`}
         >
           Especialidades
         </button>
         <button
           onClick={() => setActiveTab('salas')}
-          className={`px-6 py-4 text-base font-bold transition-all duration-300 border-b-4 -mb-[2px] ${
-            activeTab === 'salas'
+          className={`px-6 py-4 text-base font-bold transition-all duration-300 border-b-4 -mb-[2px] ${activeTab === 'salas'
               ? 'border-orange-500 text-orange-600'
               : 'border-transparent text-slate-400 hover:text-slate-600'
-          }`}
+            }`}
         >
           Salas
         </button>
@@ -262,8 +260,8 @@ export default function StudioView() {
                   {especialidades.length} {especialidades.length === 1 ? 'especialidade' : 'especialidades'} encontrada(s)
                 </p>
               </div>
-              <button 
-                onClick={handleAddEsp} 
+              <button
+                onClick={handleAddEsp}
                 className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold shadow-md shadow-blue-100 transition-all hover:scale-[1.02] active:scale-[0.98]"
               >
                 + Nova Especialidade
@@ -325,8 +323,8 @@ export default function StudioView() {
                   {salas.length} {salas.length === 1 ? 'sala pesquisada' : 'salas pesquisadas'} encontrada(s)
                 </p>
               </div>
-              <button 
-                onClick={handleAddSala} 
+              <button
+                onClick={handleAddSala}
                 className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold shadow-md shadow-blue-100 transition-all hover:scale-[1.02] active:scale-[0.98]"
               >
                 + Nova Sala
@@ -423,7 +421,7 @@ export default function StudioView() {
               <h3 className="text-2xl font-extrabold text-slate-900 tracking-tight">
                 {editingEsp ? 'Editar Especialidade' : 'Nova Especialidade'}
               </h3>
-              <button 
+              <button
                 onClick={() => setShowEspModal(false)}
                 className="p-2 text-slate-400 hover:text-slate-600 transition-colors"
               >
@@ -446,13 +444,13 @@ export default function StudioView() {
               </div>
 
               <div className="flex gap-3 justify-end pt-4">
-                <button 
+                <button
                   onClick={() => setShowEspModal(false)}
                   className="px-6 py-3 font-bold text-slate-400 hover:text-slate-600 transition-colors"
                 >
                   Cancelar
                 </button>
-                <button 
+                <button
                   onClick={handleSaveEsp}
                   className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold shadow-md shadow-blue-100"
                 >
@@ -472,7 +470,7 @@ export default function StudioView() {
               <h3 className="text-2xl font-extrabold text-slate-900 tracking-tight">
                 {editingSala ? 'Editar Sala' : 'Nova Sala'}
               </h3>
-              <button 
+              <button
                 onClick={() => setShowSalaModal(false)}
                 className="p-2 text-slate-400 hover:text-slate-600 transition-colors"
               >
@@ -565,13 +563,13 @@ export default function StudioView() {
               </div>
 
               <div className="flex gap-4 justify-end pt-4">
-                <button 
+                <button
                   onClick={() => setShowSalaModal(false)}
                   className="px-6 py-3 font-bold text-slate-400 hover:text-slate-600 transition-colors"
                 >
                   Cancelar
                 </button>
-                <button 
+                <button
                   onClick={handleSaveSala}
                   className="px-10 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold shadow-lg shadow-blue-100 transition-all hover:scale-105"
                 >
