@@ -23,11 +23,15 @@ const AgendamentoModal = ({ isOpen, agendamento, onClose, onDelete }) => {
   const [observacoesAlunos, setObservacoesAlunos] = useState({});
 
   const extrairLista = (payload) => {
+    if (!payload) return [];
     if (Array.isArray(payload)) return payload;
-    if (Array.isArray(payload?.content)) return payload.content;
-    if (Array.isArray(payload?.alunos)) return payload.alunos;
-    if (Array.isArray(payload?.data)) return payload.data;
-    if (Array.isArray(payload?.results)) return payload.results;
+    if (Array.isArray(payload.content)) return payload.content;
+    if (Array.isArray(payload.professores)) return payload.professores;
+    if (Array.isArray(payload.salas)) return payload.salas;
+    if (Array.isArray(payload.especialidades)) return payload.especialidades;
+    if (Array.isArray(payload.alunos)) return payload.alunos;
+    if (Array.isArray(payload.data)) return payload.data;
+    if (Array.isArray(payload.results)) return payload.results;
     return [];
   };
 
@@ -44,33 +48,37 @@ const AgendamentoModal = ({ isOpen, agendamento, onClose, onDelete }) => {
   };
 
   useEffect(() => {
-    if (editFields.professor !== undefined) {
-      api.get('/api/professores').then((res) => setProfessores(res.data || []));
-    }
-    if (editFields.especialidade !== undefined) {
-      api.get('/api/especialidades').then((res) => setEspecialidades(res.data || []));
-    }
-    if (editFields.sala !== undefined) {
-      api.get('/api/salas').then((res) => setSalas(res.data || []));
-    }
-  }, [editFields]);
-
-  useEffect(() => {
     if (isOpen) {
       setCarregando(true);
-      api
-        .get('/api/alunos')
-        .then((res) => {
-          const alunosRaw = extrairLista(res.data);
-          const alunosNormalizados = alunosRaw
-            .map(normalizarAluno)
-            .filter((a) => a.id !== null && a.nome);
-          setTodosAlunos(alunosNormalizados);
-        })
-        .catch((err) => {
-          console.error('Erro ao carregar alunos:', err);
-        })
-        .finally(() => setCarregando(false));
+      
+      // Buscamos tudo de uma vez para garantir que os dados estejam lá quando o usuário for editar
+      Promise.all([
+        api.get('/api/alunos').catch(() => ({ data: [] })),
+        api.get('/api/professores').catch(() => ({ data: [] })),
+        api.get('/api/salas').catch(() => ({ data: [] })),
+        api.get('/api/especialidades').catch(() => ({ data: [] }))
+      ]).then(([alunoRes, profRes, salaRes, espRes]) => {
+        // Processar Alunos
+        const alunRaw = extrairLista(alunoRes.data);
+        const alunNorm = alunRaw.map(normalizarAluno).filter(a => a.id && a.nome);
+        setTodosAlunos(alunNorm);
+
+        // Processar Professores (com normalização de nome)
+        const profRaw = extrairLista(profRes.data);
+        setProfessores(profRaw.map(p => ({
+          ...p,
+          nome: p.nome || p.nomeCompleto || p.professorNome || 'Professor sem nome'
+        })));
+
+        // Processar Salas e Especialidades
+        setSalas(extrairLista(salaRes.data));
+        setEspecialidades(extrairLista(espRes.data));
+      }).catch(err => {
+        console.error('Erro ao carregar dados do modal:', err);
+        toast.error('Erro ao carregar dados. Algumas funções podem estar indisponíveis.');
+      }).finally(() => {
+        setCarregando(false);
+      });
     }
   }, [isOpen]);
 
@@ -182,27 +190,9 @@ const AgendamentoModal = ({ isOpen, agendamento, onClose, onDelete }) => {
         patchData.dataHora = agendamento.dataHora;
       }
 
-      if (editFields.professor !== undefined) {
-        const prof = professores.find((p) => p.nome === editFields.professor);
-        if (prof) patchData.professorId = prof.id;
-      } else {
-        patchData.professorId = agendamento.professorId;
-      }
-
-      if (editFields.sala !== undefined) {
-        const sala = salas.find((s) => s.nome === editFields.sala);
-        if (sala) patchData.salaId = sala.id;
-      } else {
-        patchData.salaId = agendamento.salaId;
-      }
-
-      if (editFields.especialidade !== undefined) {
-        const esp = especialidades.find((e) => e.nome === editFields.especialidade);
-        if (esp) patchData.especialidadeId = esp.id;
-      } else {
-        patchData.especialidadeId = agendamento.especialidadeId;
-      }
-
+      patchData.professorId = editFields.professorId !== undefined ? Number(editFields.professorId) : agendamento.professorId;
+      patchData.salaId = editFields.salaId !== undefined ? Number(editFields.salaId) : agendamento.salaId;
+      patchData.especialidadeId = editFields.especialidadeId !== undefined ? Number(editFields.especialidadeId) : agendamento.especialidadeId;
       patchData.alunoIds = alunosSelecionados.map((a) => a.id);
 
       try {
@@ -213,7 +203,8 @@ const AgendamentoModal = ({ isOpen, agendamento, onClose, onDelete }) => {
         window.location.reload();
       } catch (e) {
         setCarregando(false);
-        toast.error('Erro ao salvar alterações');
+        console.error('Erro ao salvar:', e.response?.data);
+        toast.error(e.response?.data?.message || e.response?.data?.erro || 'Erro ao salvar alterações');
       }
     }
   };
@@ -292,23 +283,23 @@ const AgendamentoModal = ({ isOpen, agendamento, onClose, onDelete }) => {
                 <div className="info-item">
                   <span className="info-label"><FiUser size={14} /> Professor</span>
                   <div className="info-content">
-                    {editFields.professor !== undefined ? (
+                    {editFields.professorId !== undefined ? (
                       <select
                         className="info-edit-input"
-                        value={editFields.professor}
-                        onChange={(e) => setEditFields({ ...editFields, professor: e.target.value })}
+                        value={editFields.professorId}
+                        onChange={(e) => setEditFields({ ...editFields, professorId: e.target.value })}
                         style={{ borderColor: modalColor }}
                       >
                         <option value="">Selecione</option>
-                        {professores.map((p) => <option key={p.id} value={p.nome}>{p.nome}</option>)}
+                        {professores.map((p) => <option key={p.id} value={p.id}>{p.nome}</option>)}
                       </select>
                     ) : (
                       <>
-                        <span className="info-value">{agendamento.professor}</span>
+                        <span className="info-value">{agendamento.professorNome || agendamento.professor || 'Não informado'}</span>
                         <button 
                           className="icon-btn" 
                           style={{ color: modalColor }}
-                          onClick={() => setEditFields({ ...editFields, professor: agendamento.professor })}
+                          onClick={() => setEditFields({ ...editFields, professorId: agendamento.professorId })}
                         >
                           <FiEdit2 size={18} />
                         </button>
@@ -335,7 +326,7 @@ const AgendamentoModal = ({ isOpen, agendamento, onClose, onDelete }) => {
                         <button 
                           className="icon-btn" 
                           style={{ color: modalColor }}
-                          onClick={() => setEditFields({ ...editFields, horario: agendamento.dataHora.substring(11, 16) })}
+                          onClick={() => setEditFields({ ...editFields, horario: agendamento.dataHora?.substring(11, 16) || '' })}
                         >
                           <FiEdit2 size={18} />
                         </button>
@@ -348,23 +339,23 @@ const AgendamentoModal = ({ isOpen, agendamento, onClose, onDelete }) => {
                 <div className="info-item">
                   <span className="info-label"><FiMapPin size={14} /> Sala</span>
                   <div className="info-content">
-                    {editFields.sala !== undefined ? (
+                    {editFields.salaId !== undefined ? (
                       <select
                         className="info-edit-input"
-                        value={editFields.sala}
-                        onChange={(e) => setEditFields({ ...editFields, sala: e.target.value })}
+                        value={editFields.salaId}
+                        onChange={(e) => setEditFields({ ...editFields, salaId: e.target.value })}
                         style={{ borderColor: modalColor }}
                       >
                         <option value="">Selecione</option>
-                        {salas.map((s) => <option key={s.id} value={s.nome}>{s.nome}</option>)}
+                        {salas.map((s) => <option key={s.id} value={s.id}>{s.nome}</option>)}
                       </select>
                     ) : (
                       <>
-                        <span className="info-value">{agendamento.sala}</span>
+                        <span className="info-value">{agendamento.salaNome || agendamento.sala || 'Não informada'}</span>
                         <button 
                           className="icon-btn" 
                           style={{ color: modalColor }}
-                          onClick={() => setEditFields({ ...editFields, sala: agendamento.sala })}
+                          onClick={() => setEditFields({ ...editFields, salaId: agendamento.salaId })}
                         >
                           <FiEdit2 size={18} />
                         </button>
@@ -377,14 +368,15 @@ const AgendamentoModal = ({ isOpen, agendamento, onClose, onDelete }) => {
                 <div className="info-item">
                   <span className="info-label"><FiHash size={14} /> Especialidade</span>
                   <div className="info-content">
-                    {editFields.especialidade !== undefined ? (
+                    {editFields.especialidadeId !== undefined ? (
                       <select
                         className="info-edit-input"
-                        value={editFields.especialidade}
-                        onChange={(e) => setEditFields({ ...editFields, especialidade: e.target.value })}
+                        value={editFields.especialidadeId}
+                        onChange={(e) => setEditFields({ ...editFields, especialidadeId: e.target.value })}
                         style={{ borderColor: modalColor }}
                       >
-                        {especialidades.map((e) => <option key={e.id} value={e.nome}>{e.nome}</option>)}
+                        <option value="">Selecione</option>
+                        {especialidades.map((e) => <option key={e.id} value={e.id}>{e.nome}</option>)}
                       </select>
                     ) : (
                       <>
@@ -392,7 +384,7 @@ const AgendamentoModal = ({ isOpen, agendamento, onClose, onDelete }) => {
                         <button 
                           className="icon-btn" 
                           style={{ color: modalColor }}
-                          onClick={() => setEditFields({ ...editFields, especialidade: agendamento.especialidade })}
+                          onClick={() => setEditFields({ ...editFields, especialidadeId: agendamento.especialidadeId })}
                         >
                           <FiEdit2 size={18} />
                         </button>

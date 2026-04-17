@@ -36,7 +36,8 @@ function clearSessionAndRedirect() {
   } catch (e) {
     console.warn('Falha ao limpar localStorage:', e);
   }
-  window.location.href = '/login';
+  console.error('Sessão inválida ou expirada. Redirecionando para a raiz...');
+  window.location.href = '/';
 }
 
 // Adiciona o token de autenticação a cada requisição, se disponível
