@@ -310,7 +310,7 @@ const AgendamentoModal = ({ isOpen, agendamento, onClose, onDelete }) => {
                           style={{ color: modalColor }}
                           onClick={() => setEditFields({ ...editFields, professor: agendamento.professor })}
                         >
-                          <FiEdit2 size={14} />
+                          <FiEdit2 size={18} />
                         </button>
                       </>
                     )}
@@ -337,7 +337,7 @@ const AgendamentoModal = ({ isOpen, agendamento, onClose, onDelete }) => {
                           style={{ color: modalColor }}
                           onClick={() => setEditFields({ ...editFields, horario: agendamento.dataHora.substring(11, 16) })}
                         >
-                          <FiEdit2 size={14} />
+                          <FiEdit2 size={18} />
                         </button>
                       </>
                     )}
@@ -366,7 +366,7 @@ const AgendamentoModal = ({ isOpen, agendamento, onClose, onDelete }) => {
                           style={{ color: modalColor }}
                           onClick={() => setEditFields({ ...editFields, sala: agendamento.sala })}
                         >
-                          <FiEdit2 size={14} />
+                          <FiEdit2 size={18} />
                         </button>
                       </>
                     )}
@@ -394,7 +394,7 @@ const AgendamentoModal = ({ isOpen, agendamento, onClose, onDelete }) => {
                           style={{ color: modalColor }}
                           onClick={() => setEditFields({ ...editFields, especialidade: agendamento.especialidade })}
                         >
-                          <FiEdit2 size={14} />
+                          <FiEdit2 size={18} />
                         </button>
                       </>
                     )}
@@ -512,7 +512,7 @@ const AgendamentoModal = ({ isOpen, agendamento, onClose, onDelete }) => {
                                 style={{ color: modalColor, marginTop: '-4px' }}
                                 onClick={() => setEditFields({ ...editFields, [`observacao_${aluno.id}`]: labelObs })}
                               >
-                                <FiEdit2 size={14} />
+                                <FiEdit2 size={18} />
                               </button>
                             </div>
                           )}
@@ -523,8 +523,8 @@ const AgendamentoModal = ({ isOpen, agendamento, onClose, onDelete }) => {
                 })}
 
                 {alunosSelecionados.length === 0 && (
-                  <div style={{ textAlign: 'center', padding: '2rem', color: '#999' }}>
-                    <FiUser size={48} style={{ opacity: 0.2, marginBottom: '1rem' }} />
+                  <div className="lista-vazia">
+                    <FiUser size={48} />
                     <p>Nenhum aluno vinculado a esta aula.</p>
                   </div>
                 )}

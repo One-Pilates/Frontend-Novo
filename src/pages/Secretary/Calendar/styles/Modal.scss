@@ -212,9 +212,9 @@
 }
 
 .icon-btn {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
   border: none;
   display: flex;
   align-items: center;
@@ -224,6 +224,28 @@
   
   &:hover {
     transform: scale(1.1);
+  }
+}
+
+.lista-vazia {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+  color: var(--text-cinza);
+  text-align: center;
+  opacity: 0.6;
+
+  svg {
+    margin-bottom: 1rem;
+    color: var(--laranja-principal);
+    opacity: 0.5;
+  }
+
+  p {
+    font-size: 0.95rem;
+    font-weight: 500;
   }
 }
 
