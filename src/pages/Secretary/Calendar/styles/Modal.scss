@@ -237,11 +237,11 @@
   align-items: center;
   justify-content: center;
   transition: all 0.2s;
-  color: var(--text-cinza);
+  color: var(--branco); // Cor branca para o ícone do olho
 
   &:hover {
-    background: var(--cor-borda);
-    color: var(--text-escuro);
+    filter: brightness(0.9);
+    transform: scale(1.05);
   }
 }
 
@@ -402,8 +402,6 @@
   }
 }
 
-// Adicione esses estilos ao seu arquivo Modal.scss existente
-
 // Estilos para a seção de adicionar aluno
 .adicionar-aluno-box {
   margin-bottom: 1.5rem;
@@ -494,10 +492,8 @@
   transition: all 0.2s;
   position: relative;
 
-  &:hover {
-    .btn-remover-aluno {
-      opacity: 1;
-    }
+  .btn-remover-aluno {
+    opacity: 1; // Deixar sempre visível conforme solicitado
   }
 
   // O AlunoItem original já tem seu próprio estilo
@@ -509,7 +505,7 @@
 
 .btn-remover-aluno {
   background: #dc3545;
-  color: var(--branco);
+  color: var(--branco); // Ícone da lixeira branco
   border: none;
   border-radius: 4px;
   padding: 8px 10px;
@@ -519,12 +515,10 @@
   justify-content: center;
   transition: all 0.2s;
   flex-shrink: 0;
-  opacity: 0.7;
 
   &:hover {
     background: #c82333;
     transform: scale(1.05);
-    opacity: 1;
   }
 
   &:active {
@@ -532,12 +526,10 @@
   }
 }
 
-// Melhorias na seção de alunos
 .alunos-section {
   animation: fadeIn 0.3s ease-in-out;
 }
 
-// Responsividade
 @media (max-width: 768px) {
   .adicionar-aluno-form {
     flex-direction: column;
@@ -549,7 +541,6 @@
   }
 }
 
-// Estilos para o search de alunos
 .search-container {
   position: relative;
   flex: 1;

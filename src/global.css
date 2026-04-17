@@ -206,7 +206,28 @@ html.dark ::-webkit-scrollbar-thumb:hover {
   background: #30363d;
 }
 
-/* SweetAlert2 dark mode */
+/* SweetAlert2 global styles */
+.swal2-popup {
+  font-family: 'Poppins', sans-serif !important;
+  border-radius: 12px !important;
+}
+
+.swal2-confirm {
+  background-color: #f77433 !important;
+  box-shadow: 0 4px 12px rgba(247, 116, 51, 0.3) !important;
+  padding: 10px 24px !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+}
+
+.swal2-cancel {
+  background-color: #6e7881 !important;
+  padding: 10px 24px !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+}
+
+/* SweetAlert2 dark mode overrides */
 html.dark .swal2-popup {
   background-color: #161b22;
   color: #fafbfc;
@@ -235,6 +256,6 @@ html.dark .swal2-confirm {
 }
 
 html.dark .swal2-cancel {
-  background-color: #21262d !important;
+  background-color: #30363d !important;
   color: #fafbfc !important;
 }

@@ -21,6 +21,27 @@ const AgendamentoModal = ({ isOpen, agendamento, onClose, onDelete }) => {
   const [observacoesExpandidas, setObservacoesExpandidas] = useState({});
   const [observacoesAlunos, setObservacoesAlunos] = useState({});
 
+  const extrairLista = (payload) => {
+    if (Array.isArray(payload)) return payload;
+    if (Array.isArray(payload?.content)) return payload.content;
+    if (Array.isArray(payload?.alunos)) return payload.alunos;
+    if (Array.isArray(payload?.data)) return payload.data;
+    if (Array.isArray(payload?.results)) return payload.results;
+    return [];
+  };
+
+  const normalizarAluno = (aluno) => {
+    const id = aluno?.id ?? aluno?.idAluno ?? aluno?.alunoId ?? null;
+    const nome = aluno?.nome ?? aluno?.nomeCompleto ?? aluno?.alunoNome ?? '';
+
+    return {
+      ...aluno,
+      id,
+      nome,
+      alunoComLimitacoesFisicas: aluno?.alunoComLimitacoesFisicas ?? false,
+    };
+  };
+
   useEffect(() => {
     if (editFields.professor !== undefined) {
       api.get('/api/professores').then((res) => setProfessores(res.data || []));
@@ -34,16 +55,31 @@ const AgendamentoModal = ({ isOpen, agendamento, onClose, onDelete }) => {
   }, [editFields]);
 
   useEffect(() => {
-    if (activeTab === 'alunos' && todosAlunos.length === 0) {
+    if (isOpen) {
+      setCarregando(true);
+      toast.loading('Carregando alunos...', { id: 'fetch-alunos' });
       api
         .get('/api/alunos')
         .then((res) => {
-          const data = res.data;
-          setTodosAlunos(Array.isArray(data) ? data : (data?.content ?? []));
+          const alunosRaw = extrairLista(res.data);
+          const alunosNormalizados = alunosRaw
+            .map(normalizarAluno)
+            .filter((a) => a.id !== null && a.nome);
+          
+          setTodosAlunos(alunosNormalizados);
+          if (alunosNormalizados.length > 0) {
+            toast.success(`${alunosNormalizados.length} alunos carregados.`, { id: 'fetch-alunos' });
+          } else {
+            toast.warning('A lista de alunos retornou vazia.', { id: 'fetch-alunos' });
+          }
         })
-        .catch((err) => console.error('Erro ao carregar alunos:', err));
+        .catch((err) => {
+          console.error('Erro ao carregar alunos:', err);
+          toast.error('Erro ao buscar alunos no servidor.', { id: 'fetch-alunos' });
+        })
+        .finally(() => setCarregando(false));
     }
-  }, [activeTab, todosAlunos.length]);
+  }, [isOpen]); // Removido todosAlunos.length para garantir tentativa ao abrir se estiver vazio
 
   useEffect(() => {
     if (agendamento?.alunos) {
@@ -237,9 +273,13 @@ const AgendamentoModal = ({ isOpen, agendamento, onClose, onDelete }) => {
     setMostrarListaAlunos(false);
   };
 
-  const alunosDisponiveis = Array.isArray(todosAlunos)
-    ? todosAlunos.filter((aluno) => !alunosSelecionados.find((a) => a.id === aluno.id))
-    : [];
+  const alunosOrdenados = [...todosAlunos].sort((a, b) =>
+    (a.nome || '').localeCompare(b.nome || '', 'pt-BR', { sensitivity: 'base' }),
+  );
+
+  const alunosDisponiveis = alunosOrdenados.filter(
+    (aluno) => !alunosSelecionados.find((a) => a.id === aluno.id),
+  );
 
   const alunosMudaram =
     (agendamento.alunos?.length || 0) !== alunosSelecionados.length ||
@@ -512,47 +552,38 @@ const AgendamentoModal = ({ isOpen, agendamento, onClose, onDelete }) => {
               <div className="adicionar-aluno-box">
                 <div className="adicionar-aluno-label">Adicionar Aluno</div>
                 <div className="adicionar-aluno-form">
-                  <div className="search-container">
-                    <input
-                      type="text"
-                      className="aluno-search"
-                      placeholder="Pesquisar aluno..."
-                      value={searchAluno}
-                      onChange={(e) => {
-                        setSearchAluno(e.target.value);
-                        setMostrarListaAlunos(true);
-                      }}
-                      onFocus={() => setMostrarListaAlunos(true)}
-                      style={{
-                        borderColor: modalColor,
-                        accentColor: modalColor,
-                      }}
-                    />
-                    {mostrarListaAlunos && (
-                      <div className="search-results">
-                        {alunosDisponiveis
-                          .filter((aluno) =>
-                            aluno.nome.toLowerCase().includes(searchAluno.toLowerCase()),
-                          )
-                          .slice(0, 10)
-                          .map((aluno) => (
-                            <div
-                              key={aluno.id}
-                              className="search-result-item"
-                              onClick={() => handleAdicionarAluno(aluno)}
-                            >
-                              {aluno.nome}
-                            </div>
-                          ))}
-                        {alunosDisponiveis.filter((aluno) =>
-                          aluno.nome.toLowerCase().includes(searchAluno.toLowerCase()),
-                        ).length === 0 &&
-                          searchAluno && (
-                            <div className="search-result-item empty">Nenhum aluno encontrado</div>
-                          )}
-                      </div>
+                  <select
+                    className="aluno-select"
+                    defaultValue=""
+                    onChange={(e) => {
+                      const alunoSelecionado = todosAlunos.find(
+                        (aluno) => String(aluno.id) === e.target.value,
+                      );
+                      if (alunoSelecionado) {
+                        handleAdicionarAluno(alunoSelecionado);
+                        e.target.value = '';
+                      }
+                    }}
+                    style={{
+                      borderColor: modalColor,
+                      accentColor: modalColor,
+                    }}
+                  >
+                    <option value="" disabled>
+                      {carregando ? 'Carregando alunos...' : 'Selecionar aluno para adicionar'}
+                    </option>
+                    {alunosDisponiveis.length === 0 ? (
+                      <option value="" disabled>
+                        Nenhum aluno disponível
+                      </option>
+                    ) : (
+                      alunosDisponiveis.map((aluno) => (
+                        <option key={aluno.id} value={aluno.id}>
+                          {aluno.nome} {aluno.alunoComLimitacoesFisicas ? ' (PCD)' : ''}
+                        </option>
+                      ))
                     )}
-                  </div>
+                  </select>
                 </div>
               </div>
 
@@ -595,7 +626,10 @@ const AgendamentoModal = ({ isOpen, agendamento, onClose, onDelete }) => {
                                 }))
                               }
                               title={expandido ? 'Ocultar observação' : 'Ver observação'}
-                              style={{ color: modalColor }}
+                              style={{
+                                color: '#fff',
+                                backgroundColor: modalColor,
+                              }}
                             >
                               {expandido ? <FiEyeOff size={15} /> : <FiEye size={15} />}
                             </button>
@@ -604,8 +638,9 @@ const AgendamentoModal = ({ isOpen, agendamento, onClose, onDelete }) => {
                               onClick={() => handleRemoverAluno(aluno.id)}
                               title="Remover aluno"
                               style={{
-                                color: modalColor,
-                                borderColor: modalColor,
+                                color: '#fff',
+                                backgroundColor: '#dc3545',
+                                borderColor: '#dc3545',
                               }}
                             >
                               <FiTrash2 size={14} />

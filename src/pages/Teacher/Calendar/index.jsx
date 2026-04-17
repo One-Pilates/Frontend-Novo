@@ -34,19 +34,7 @@ const Calendar = () => {
 
   const getColorForEspecialidade = (esp) => {
     const backgroundColor = especialidadeCores[esp] || '#3788d8';
-    const textColor = [
-      '#ff6600',
-      '#4CAF50',
-      '#2196F3',
-      '#9C27B0',
-      '#673AB7',
-      '#E91E63',
-      '#009688',
-      '#03A9F4',
-    ].includes(backgroundColor)
-      ? '#fff'
-      : '#000';
-    return { backgroundColor, textColor };
+    return { backgroundColor, textColor: '#fff' };
   };
 
   async function fetchAgendamentos() {

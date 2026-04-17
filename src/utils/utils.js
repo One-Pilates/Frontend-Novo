@@ -227,16 +227,5 @@ export const especialidadeCores = {
  */
 export const getColorForEspecialidade = (especialidade) => {
   const backgroundColor = especialidadeCores[especialidade] || '#3788d8';
-  const coresComTextoClaro = [
-    '#ff6600',
-    '#4CAF50',
-    '#2196F3',
-    '#9C27B0',
-    '#673AB7',
-    '#E91E63',
-    '#009688',
-    '#03A9F4',
-  ];
-  const textColor = coresComTextoClaro.includes(backgroundColor) ? '#fff' : '#000';
-  return { backgroundColor, textColor };
+  return { backgroundColor, textColor: '#fff' };
 };
