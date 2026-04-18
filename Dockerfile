@@ -1,20 +1,29 @@
-# Stage de Servidor - Nginx para servir arquivos estáticos
-FROM nginx:stable-alpine
+# Etapa 1: build da aplicação
+FROM node:20-alpine AS builder
 
-# Copiar arquivos de build do host para o container
-# Nota: O build (npm run build) deve ocorrer no GitHub Actions antes do docker build
-COPY dist /usr/share/nginx/html
+WORKDIR /app
 
-# Copiar configuração customizada do Nginx para suportar React Router
-RUN echo 'server { \
-    listen 80; \
-    location / { \
-        root /usr/share/nginx/html; \
-        index index.html index.htm; \
-        try_files $uri $uri/ /index.html; \
-    } \
-}' > /etc/nginx/conf.d/default.conf
+# Copia arquivos de dependências primeiro (melhora cache)
+COPY package*.json ./
 
+# Instala dependências
+RUN npm ci
+
+# Copia o restante do projeto e gera build
+COPY . .
+RUN npm run build
+
+# Etapa 2: servir arquivos estáticos
+FROM nginx:1.27-alpine AS runner
+
+# Limpa conteúdo padrão do Nginx
+RUN rm -rf /usr/share/nginx/html/*
+
+# Ajuste aqui se seu build gerar em outra pasta (ex.: build ao invés de dist)
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# Expondo porta padrão HTTP
 EXPOSE 80
 
+# Inicia Nginx em foreground
 CMD ["nginx", "-g", "daemon off;"]
