@@ -4,7 +4,17 @@ import { useAuth } from '../../../hooks/useAuth';
 import api from '../../../services/api';
 import { toast } from 'sonner';
 import Swal from 'sweetalert2';
-import { FiSearch, FiPhone, FiMail, FiTrash2, FiCalendar, FiChevronDown, FiLoader, FiUserCheck, FiUserX } from 'react-icons/fi';
+import {
+  FiSearch,
+  FiPhone,
+  FiMail,
+  FiTrash2,
+  FiCalendar,
+  FiChevronDown,
+  FiLoader,
+  FiUserCheck,
+  FiUserX,
+} from 'react-icons/fi';
 import Botao from '../../../components/Button';
 import userIconImg from '/user-icon.png';
 import { getColorForEspecialidade } from '../../../utils/utils';
@@ -93,15 +103,15 @@ export default function GerenciamentoProfessor() {
   };
 
   const alterarStatusProfessor = async (professorId, statusAtual) => {
-    const novoStatus = statusAtual ? 0 : 1;
-    const acao = novoStatus === 1 ? 'ativar' : 'desativar';
+    const novoStatus = !statusAtual;
+    const acao = novoStatus ? 'ativar' : 'desativar';
 
     Swal.fire({
       title: 'Alterar status?',
       text: `Deseja realmente ${acao} este professor?`,
       icon: 'question',
       showCancelButton: true,
-      confirmButtonColor: novoStatus === 1 ? '#10b981' : '#ef4444',
+      confirmButtonColor: novoStatus ? '#10b981' : '#ef4444',
       cancelButtonColor: '#3085d6',
       confirmButtonText: `Sim, ${acao}!`,
       cancelButtonText: 'Cancelar',
@@ -109,9 +119,9 @@ export default function GerenciamentoProfessor() {
       if (result.isConfirmed) {
         try {
           await api.patch(`api/professores/${professorId}`, { status: novoStatus });
-          toast.success(`Professor ${novoStatus === 1 ? 'ativado' : 'desativado'} com sucesso.`);
+          toast.success(`Professor ${novoStatus ? 'ativado' : 'desativado'} com sucesso.`);
           setProfessores((prev) =>
-            prev.map((p) => (p.id === professorId ? { ...p, status: novoStatus === 1 } : p)),
+            prev.map((p) => (p.id === professorId ? { ...p, status: novoStatus } : p)),
           );
         } catch (error) {
           console.error('Erro ao alterar status:', error);
@@ -133,7 +143,9 @@ export default function GerenciamentoProfessor() {
   return (
     <div className="flex flex-col gap-6 py-6 px-4 md:px-8 lg:px-16 h-full mx-auto ml-auto bg-slate-50/20">
       <div className="flex flex-col sm:flex-row w-full justify-between items-start sm:items-center gap-4">
-        <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Gerenciamento de Professores</h1>
+        <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
+          Gerenciamento de Professores
+        </h1>
         {user && user.role === 'ADMINISTRADOR' && (
           <button
             onClick={() => navigate(`${basePath}/professor/cadastrar`)}
@@ -171,7 +183,7 @@ export default function GerenciamentoProfessor() {
           professores.map((professor) => (
             <div
               key={professor.id}
-              className="flex flex-col rounded-3xl p-6 shadow-sm hover:shadow-md transition-all duration-300 border border-slate-100 bg-white hover:translate-y-[-2px]"
+              className="flex flex-col rounded-3xl p-6 shadow-sm hover:shadow-md transition-all duration-300 border border-slate-100 bg-white hover:-translate-y-0.5"
             >
               <div className="flex flex-col sm:flex-row items-center sm:items-start justify-between mb-4 gap-4">
                 <div className="flex items-center gap-6 w-full sm:w-auto">
@@ -228,7 +240,9 @@ export default function GerenciamentoProfessor() {
                       <div className="p-1.5 rounded-lg bg-orange-50 text-orange-600">
                         <FiPhone size={14} />
                       </div>
-                      <span className="text-sm font-medium">{professor.telefone || 'Sem telefone'}</span>
+                      <span className="text-sm font-medium">
+                        {professor.telefone || 'Sem telefone'}
+                      </span>
                     </div>
                     <div className="flex items-center gap-2.5 text-slate-600">
                       <div className="p-1.5 rounded-lg bg-blue-50 text-blue-600">
@@ -247,11 +261,15 @@ export default function GerenciamentoProfessor() {
                             key={esp.id}
                             className="px-4 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wider border border-white/50 shadow-sm"
                             style={{ backgroundColor, color: textColor }}
-                          >{esp.nome}</span>
+                          >
+                            {esp.nome}
+                          </span>
                         );
                       })
                     ) : (
-                      <span className="text-xs text-slate-400 font-medium italic">Nenhuma especialidade</span>
+                      <span className="text-xs text-slate-400 font-medium italic">
+                        Nenhuma especialidade
+                      </span>
                     )}
                   </div>
                 </div>
@@ -261,7 +279,9 @@ export default function GerenciamentoProfessor() {
                     <button
                       onClick={() => alterarStatusProfessor(professor.id, professor.status)}
                       className={`p-3 rounded-xl transition-all hover:scale-110 active:scale-95 border ${
-                        professor.status ? 'bg-emerald-50 text-emerald-500 border-emerald-100 hover:bg-emerald-100' : 'bg-rose-50 text-rose-500 border-rose-100 hover:bg-rose-100'
+                        professor.status
+                          ? 'bg-emerald-50 text-emerald-500 border-emerald-100 hover:bg-emerald-100'
+                          : 'bg-rose-50 text-rose-500 border-rose-100 hover:bg-rose-100'
                       }`}
                       title={professor.status ? 'Desativar Professor' : 'Ativar Professor'}
                     >
@@ -280,7 +300,9 @@ export default function GerenciamentoProfessor() {
             </div>
           ))
         ) : (
-          <div className="flex items-center justify-center h-40 text-slate-400 font-medium">Nenhum professor encontrado</div>
+          <div className="flex items-center justify-center h-40 text-slate-400 font-medium">
+            Nenhum professor encontrado
+          </div>
         )}
 
         {professoresOriginais.length > 0 && temMaisProfessores && (
@@ -290,7 +312,7 @@ export default function GerenciamentoProfessor() {
               disabled={carregandoMais}
               className={`
                 group relative flex items-center justify-center gap-3
-                px-14 py-4 rounded-[1.5rem] font-bold text-lg
+                px-14 py-4 rounded-3xl font-bold text-lg
                 transition-all duration-300 ease-out
                 shadow-lg shadow-orange-100
                 hover:shadow-xl hover:shadow-orange-200
@@ -300,7 +322,7 @@ export default function GerenciamentoProfessor() {
               `}
               style={{ backgroundColor: 'var(--laranja-principal)', color: 'var(--branco)' }}
             >
-              <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-[shimmer_2s_infinite]" />
+              <div className="absolute inset-0 w-full h-full bg-linear-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-[shimmer_2s_infinite]" />
               {carregandoMais ? (
                 <>
                   <FiLoader className="animate-spin text-2xl" />
