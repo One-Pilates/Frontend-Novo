@@ -18,7 +18,6 @@ import api from '../../../../services/api';
 import Swal from 'sweetalert2';
 import { toast } from 'sonner';
 import { getColorForEspecialidade } from '../../../../utils/utils';
-import { buildPromptRecomendacao } from '../../../../config/iaPrompts';
 import '../styles/Modal.scss';
 
 
@@ -192,46 +191,23 @@ const AgendamentoModal = ({ isOpen, agendamento, onClose, onDelete }) => {
   const handlePedirRecomendacaoIA = async (alunoId, nomeAluno, observacao, especialidade) => {
     if (!observacao || !observacao.trim()) return;
 
-    const groqKey = import.meta.env.VITE_GROQ_API_KEY;
-    if (!groqKey) {
-      toast.error('Chave da IA não configurada. Verifique o arquivo .env');
-      return;
-    }
-
     setiaCarregando((prev) => ({ ...prev, [alunoId]: true }));
     setiaRecomendacoes((prev) => ({ ...prev, [alunoId]: null }));
 
-    const prompt = buildPromptRecomendacao({ nomeAluno, observacao, especialidade });
-
     try {
-      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${groqKey}`,
-        },
-        body: JSON.stringify({
-          model: 'llama-3.3-70b-versatile',
-          messages: [{ role: 'user', content: prompt }],
-          temperature: 0.7,
-          max_tokens: 800,
-        }),
+      // Chamada para o nosso backend que agora gerencia a chave da Groq de forma segura
+      const response = await api.post('/api/ia/recomendacao', {
+        nomeAluno: nomeAluno, // O backend pode anonimizar ou usar para contexto
+        observacao,
+        especialidade,
       });
 
-      if (!response.ok) {
-        const errBody = await response.json().catch(() => ({}));
-        throw new Error(errBody?.error?.message || `Erro ${response.status}`);
-      }
-
-      const data = await response.json();
-      const texto =
-        data?.choices?.[0]?.message?.content ||
-        'Não foi possível gerar uma recomendação.';
-
+      const texto = response.data?.recomendacao || 'Não foi possível gerar uma recomendação.';
       setiaRecomendacoes((prev) => ({ ...prev, [alunoId]: texto }));
     } catch (err) {
       console.error('Erro IA:', err);
-      toast.error('Não foi possível gerar recomendação. Tente novamente.');
+      const msgErro = err.response?.data?.erro || err.response?.data?.message || 'Não foi possível gerar recomendação. Tente novamente.';
+      toast.error(msgErro);
     } finally {
       setiaCarregando((prev) => ({ ...prev, [alunoId]: false }));
     }
