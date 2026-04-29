@@ -20,6 +20,8 @@ import { toast } from 'sonner';
 import { getColorForEspecialidade } from '../../../../utils/utils';
 import '../styles/Modal.scss';
 
+
+
 const AgendamentoModal = ({ isOpen, agendamento, onClose, onDelete }) => {
   const [activeTab, setActiveTab] = useState('informacoes');
   const [editFields, setEditFields] = useState({});
@@ -31,6 +33,8 @@ const AgendamentoModal = ({ isOpen, agendamento, onClose, onDelete }) => {
   const [carregando, setCarregando] = useState(false);
   const [observacoesExpandidas, setObservacoesExpandidas] = useState({});
   const [observacoesAlunos, setObservacoesAlunos] = useState({});
+  const [iaRecomendacoes, setiaRecomendacoes] = useState({});
+  const [iaCarregando, setiaCarregando] = useState({});
 
   const extrairLista = (payload) => {
     if (!payload) return [];
@@ -181,6 +185,31 @@ const AgendamentoModal = ({ isOpen, agendamento, onClose, onDelete }) => {
     } catch {
       setCarregando(false);
       toast.error('Erro ao salvar observação');
+    }
+  };
+
+  const handlePedirRecomendacaoIA = async (alunoId, nomeAluno, observacao, especialidade) => {
+    if (!observacao || !observacao.trim()) return;
+
+    setiaCarregando((prev) => ({ ...prev, [alunoId]: true }));
+    setiaRecomendacoes((prev) => ({ ...prev, [alunoId]: null }));
+
+    try {
+      // Chamada para o nosso backend que agora gerencia a chave da Groq de forma segura
+      const response = await api.post('/api/ia/recomendacao', {
+        nomeAluno: nomeAluno, // O backend pode anonimizar ou usar para contexto
+        observacao,
+        especialidade,
+      });
+
+      const texto = response.data?.recomendacao || 'Não foi possível gerar uma recomendação.';
+      setiaRecomendacoes((prev) => ({ ...prev, [alunoId]: texto }));
+    } catch (err) {
+      console.error('Erro IA:', err);
+      const msgErro = err.response?.data?.erro || err.response?.data?.message || 'Não foi possível gerar recomendação. Tente novamente.';
+      toast.error(msgErro);
+    } finally {
+      setiaCarregando((prev) => ({ ...prev, [alunoId]: false }));
     }
   };
 
@@ -605,23 +634,85 @@ const AgendamentoModal = ({ isOpen, agendamento, onClose, onDelete }) => {
                                 display: 'flex',
                                 justifyContent: 'space-between',
                                 alignItems: 'flex-start',
+                                gap: '8px',
                               }}
                             >
-                              <p style={{ fontSize: '0.875rem', color: '#666', margin: 0 }}>
+                              <p style={{ fontSize: '0.875rem', color: '#666', margin: 0, flex: 1 }}>
                                 {labelObs || 'Sem observações.'}
                               </p>
-                              <button
-                                className="icon-btn"
-                                style={{ color: modalColor, marginTop: '-4px' }}
-                                onClick={() =>
-                                  setEditFields({
-                                    ...editFields,
-                                    [`observacao_${aluno.id}`]: labelObs,
-                                  })
-                                }
-                              >
-                                <FiEdit2 size={18} />
-                              </button>
+                              <div style={{ display: 'flex', gap: '6px', flexShrink: 0 }}>
+                                {labelObs && (
+                                  <button
+                                    className="btn-oneia-obs"
+                                    title="Receber recomendação da IA"
+                                    onClick={() =>
+                                      handlePedirRecomendacaoIA(
+                                        aluno.id,
+                                        aluno.nome,
+                                        labelObs,
+                                        agendamento.especialidade,
+                                      )
+                                    }
+                                    disabled={iaCarregando[aluno.id]}
+                                  >
+                                    ✨
+                                  </button>
+                                )}
+                                <button
+                                  className="icon-btn"
+                                  style={{ color: modalColor, marginTop: '-4px' }}
+                                  onClick={() =>
+                                    setEditFields({
+                                      ...editFields,
+                                      [`observacao_${aluno.id}`]: labelObs,
+                                    })
+                                  }
+                                >
+                                  <FiEdit2 size={18} />
+                                </button>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Painel de recomendação OneIA */}
+                          {iaCarregando[aluno.id] && (
+                            <div className="oneia-loading-panel">
+                              <div className="oneia-shimmer" />
+                              <div className="oneia-shimmer" style={{ width: '80%' }} />
+                              <div className="oneia-shimmer" style={{ width: '90%' }} />
+                            </div>
+                          )}
+                          {!iaCarregando[aluno.id] && iaRecomendacoes[aluno.id] && (
+                            <div className="oneia-response-panel">
+                              <div className="oneia-response-header">
+                                <span className="oneia-badge">✨ OneIA - Recomendação</span>
+                                <button
+                                  className="oneia-close-btn"
+                                  onClick={() =>
+                                    setiaRecomendacoes((prev) => ({
+                                      ...prev,
+                                      [aluno.id]: null,
+                                    }))
+                                  }
+                                >
+                                  <FiX size={14} />
+                                </button>
+                              </div>
+                              <div className="oneia-response-body">
+                                {iaRecomendacoes[aluno.id]
+                                  .split('\n')
+                                  .map((linha, i) =>
+                                    linha.trim() ? (
+                                      <p key={i} className="oneia-linha">
+                                        {linha
+                                          .replace(/\*\*(.*?)\*\*/g, '$1')
+                                          .replace(/\*(.*?)\*/g, '$1')}
+                                      </p>
+                                    ) : (
+                                      <br key={i} />
+                                    ),
+                                  )}
+                              </div>
                             </div>
                           )}
                         </div>
@@ -662,3 +753,4 @@ const AgendamentoModal = ({ isOpen, agendamento, onClose, onDelete }) => {
 };
 
 export default AgendamentoModal;
+
