@@ -485,3 +485,147 @@
     padding: 0.5rem 1rem;
   }
 }
+
+// ──────────────────────────────────────────────
+// Botão IA ✨ — animação de brilho, sem fundo
+// ──────────────────────────────────────────────
+@keyframes iaSpin {
+  0%   { transform: rotate(0deg) scale(1); }
+  25%  { transform: rotate(20deg) scale(1.2); }
+  50%  { transform: rotate(-15deg) scale(1.3); }
+  75%  { transform: rotate(10deg) scale(1.15); }
+  100% { transform: rotate(0deg) scale(1); }
+}
+
+.btn-oneia-obs {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  margin-top: -2px;
+  padding: 0;
+  line-height: 1;
+
+  &:hover:not(:disabled) {
+    background: transparent;
+    animation: iaSpin 0.5s ease-in-out;
+  }
+
+  &:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+}
+
+// ──────────────────────────────────────────────
+// Loading Shimmer
+// ──────────────────────────────────────────────
+@keyframes shimmerSlide {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+.oneia-loading-panel {
+  margin-top: 10px;
+  padding: 0.875rem 1rem;
+  background: #fff9f6;
+  border-radius: 12px;
+  border: 1px solid rgba(247, 116, 51, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.oneia-shimmer {
+  height: 12px;
+  width: 100%;
+  border-radius: 6px;
+  background: linear-gradient(
+    90deg,
+    rgba(247, 116, 51, 0.06) 25%,
+    rgba(247, 116, 51, 0.18) 50%,
+    rgba(247, 116, 51, 0.06) 75%
+  );
+  background-size: 800px 100%;
+  animation: shimmerSlide 1.3s ease-in-out infinite;
+}
+
+// ──────────────────────────────────────────────
+// Painel de Resposta IA — limpo e escaneável
+// ──────────────────────────────────────────────
+@keyframes iaFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.oneia-response-panel {
+  margin-top: 10px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(247, 116, 51, 0.2);
+  box-shadow: 0 4px 16px rgba(247, 116, 51, 0.08);
+  animation: iaFadeIn 0.3s ease-out;
+}
+
+.oneia-response-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.875rem;
+  background: var(--laranja-principal, #f77433);
+}
+
+.oneia-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: white;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.95;
+}
+
+.oneia-close-btn {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.22);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.38);
+  }
+}
+
+.oneia-response-body {
+  padding: 0.875rem 1rem;
+  background: #fffcfa;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.oneia-linha {
+  font-size: 0.83rem;
+  color: #3a2a1a;
+  line-height: 1.6;
+  margin: 0 0 4px 0;
+
+  // Destaque para linhas com emoji (seções)
+  &:has(> span.ia-emoji) {
+    margin-top: 8px;
+    font-weight: 600;
+  }
+}
+
