@@ -19,6 +19,7 @@ import Swal from 'sweetalert2';
 import { toast } from 'sonner';
 import { getColorForEspecialidade } from '../../../../utils/utils';
 import '../styles/Modal.scss';
+import OneIAModal from './OneIAModal';
 
 
 
@@ -35,6 +36,7 @@ const AgendamentoModal = ({ isOpen, agendamento, onClose, onDelete }) => {
   const [observacoesAlunos, setObservacoesAlunos] = useState({});
   const [iaRecomendacoes, setiaRecomendacoes] = useState({});
   const [iaCarregando, setiaCarregando] = useState({});
+  const [oneIAModal, setOneIAModal] = useState({ open: false, alunoId: null, nomeAluno: '', observacao: '', recomendacao: '' });
 
   const extrairLista = (payload) => {
     if (!payload) return [];
@@ -195,19 +197,43 @@ const AgendamentoModal = ({ isOpen, agendamento, onClose, onDelete }) => {
     setiaRecomendacoes((prev) => ({ ...prev, [alunoId]: null }));
 
     try {
-      // Chamada para o nosso backend que agora gerencia a chave da Groq de forma segura
       const response = await api.post('/api/ia/recomendacao', {
-        nomeAluno: nomeAluno, // O backend pode anonimizar ou usar para contexto
+        nomeAluno,
         observacao,
         especialidade,
       });
 
       const texto = response.data?.recomendacao || 'Não foi possível gerar uma recomendação.';
       setiaRecomendacoes((prev) => ({ ...prev, [alunoId]: texto }));
+
+      // Abre o modal OneIA com a recomendação inicial
+      setOneIAModal({
+        open: true,
+        alunoId,
+        nomeAluno,
+        observacao,
+        recomendacao: texto,
+      });
     } catch (err) {
-      console.error('Erro IA:', err);
-      const msgErro = err.response?.data?.erro || err.response?.data?.message || 'Não foi possível gerar recomendação. Tente novamente.';
-      toast.error(msgErro);
+      console.error('Erro IA (Backend):', err);
+      
+      // FALLBACK PARA TESTE: Se o backend falhar, vamos simular uma resposta para o usuário ver o modal funcionando
+      const simulationText = `### Recomendação Simulada (Backend offline)
+Como o serviço de IA não respondeu, aqui está uma sugestão genérica para ${nomeAluno}:
+1. Foque em exercícios de mobilidade articular.
+2. Evite sobrecarga na região mencionada: "${observacao}".
+3. Monitore a respiração durante os movimentos de ${especialidade}.`;
+
+      toast.info('Simulando recomendação (Backend não respondeu)');
+      
+      setiaRecomendacoes((prev) => ({ ...prev, [alunoId]: simulationText }));
+      setOneIAModal({
+        open: true,
+        alunoId,
+        nomeAluno,
+        observacao,
+        recomendacao: simulationText,
+      });
     } finally {
       setiaCarregando((prev) => ({ ...prev, [alunoId]: false }));
     }
@@ -674,45 +700,12 @@ const AgendamentoModal = ({ isOpen, agendamento, onClose, onDelete }) => {
                             </div>
                           )}
 
-                          {/* Painel de recomendação OneIA */}
+                          {/* Indicador de carregamento IA */}
                           {iaCarregando[aluno.id] && (
                             <div className="oneia-loading-panel">
                               <div className="oneia-shimmer" />
                               <div className="oneia-shimmer" style={{ width: '80%' }} />
                               <div className="oneia-shimmer" style={{ width: '90%' }} />
-                            </div>
-                          )}
-                          {!iaCarregando[aluno.id] && iaRecomendacoes[aluno.id] && (
-                            <div className="oneia-response-panel">
-                              <div className="oneia-response-header">
-                                <span className="oneia-badge">✨ OneIA - Recomendação</span>
-                                <button
-                                  className="oneia-close-btn"
-                                  onClick={() =>
-                                    setiaRecomendacoes((prev) => ({
-                                      ...prev,
-                                      [aluno.id]: null,
-                                    }))
-                                  }
-                                >
-                                  <FiX size={14} />
-                                </button>
-                              </div>
-                              <div className="oneia-response-body">
-                                {iaRecomendacoes[aluno.id]
-                                  .split('\n')
-                                  .map((linha, i) =>
-                                    linha.trim() ? (
-                                      <p key={i} className="oneia-linha">
-                                        {linha
-                                          .replace(/\*\*(.*?)\*\*/g, '$1')
-                                          .replace(/\*(.*?)\*/g, '$1')}
-                                      </p>
-                                    ) : (
-                                      <br key={i} />
-                                    ),
-                                  )}
-                              </div>
                             </div>
                           )}
                         </div>
@@ -748,6 +741,20 @@ const AgendamentoModal = ({ isOpen, agendamento, onClose, onDelete }) => {
           )}
         </div>
       </div>
+
+      {/* Modal OneIA — sobrepõe o modal de aula */}
+      <OneIAModal
+        isOpen={oneIAModal.open}
+        nomeAluno={oneIAModal.nomeAluno}
+        observacao={oneIAModal.observacao}
+        especialidade={agendamento.especialidade}
+        recomendacaoInicial={oneIAModal.recomendacao}
+        onBack={() => setOneIAModal((s) => ({ ...s, open: false }))}
+        onClose={() => {
+          setOneIAModal((s) => ({ ...s, open: false }));
+          handleClose();
+        }}
+      />
     </div>
   );
 };

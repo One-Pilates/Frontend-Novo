@@ -1,0 +1,411 @@
+@use '../../../../variables.scss' as *;
+
+// ═══════════════════════════════════════════════════
+//  Keyframes
+// ═══════════════════════════════════════════════════
+@keyframes oneiaEntrance {
+  0% {
+    opacity: 0;
+    transform: scale(0.94) translateY(30px);
+    filter: blur(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes bubblePop {
+  0%   { opacity: 0; transform: scale(0.85) translateY(12px); }
+  70%  { transform: scale(1.03) translateY(-2px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes cursorBlink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+@keyframes typingDot {
+  0%, 80%, 100% { transform: scale(0); opacity: 0.3; }
+  40%           { transform: scale(1);   opacity: 1; }
+}
+
+@keyframes iaGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(247, 116, 51, 0.25); }
+  50%      { box-shadow: 0 0 0 8px rgba(247, 116, 51, 0); }
+}
+
+// ═══════════════════════════════════════════════════
+//  Overlay — fica por CIMA do modal de aula
+//  z-index: 1100 > 1000 do .modal-overlay principal
+// ═══════════════════════════════════════════════════
+.oneia-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: rgba(0, 0, 0, 0.4); // Igual ao modal de aula
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+// ═══════════════════════════════════════════════════
+//  Caixa do modal — mesmo tamanho do AulaModal
+// ═══════════════════════════════════════════════════
+.oneia-modal-content {
+  background: white;
+  border-radius: 20px;
+  max-width: 580px;
+  width: 100%;
+  max-height: 90vh;
+  height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow:
+    0 30px 60px -15px rgba(0, 0, 0, 0.15),
+    0 0 0 1px rgba(0, 0, 0, 0.02);
+  animation: oneiaEntrance 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+// ═══════════════════════════════════════════════════
+//  Header
+// ═══════════════════════════════════════════════════
+.oneia-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  background: linear-gradient(
+    to right,
+    rgba(247, 116, 51, 0.08),
+    rgba(247, 116, 51, 0.02),
+    transparent
+  );
+  flex-shrink: 0;
+}
+
+.oneia-back-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid rgba(247, 116, 51, 0.2);
+  background: rgba(247, 116, 51, 0.05);
+  color: #f77433;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+
+  &:hover {
+    background: rgba(247, 116, 51, 0.12);
+    transform: translateX(-2px);
+  }
+}
+
+.oneia-close-top-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: none;
+  background: rgba(0, 0, 0, 0.03);
+  color: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  margin-left: auto;
+
+  &:hover {
+    background: #fee2e2;
+    color: #ef4444;
+    transform: rotate(90deg);
+  }
+}
+
+.oneia-header-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.oneia-header-badge {
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  background: linear-gradient(135deg, #f77433, #ff9a5c);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.oneia-header-subtitle {
+  font-size: 0.75rem;
+  color: #888;
+  font-weight: 400;
+
+  strong {
+    color: #333;
+    font-weight: 600;
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  Área de chat (scrollável)
+// ═══════════════════════════════════════════════════
+.oneia-chat-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  scroll-behavior: smooth;
+  background: #fcfcfc;
+
+  // Scrollbar customizada
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(247, 116, 51, 0.15);
+    border-radius: 4px;
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  Bolhas de chat
+// ═══════════════════════════════════════════════════
+.oneia-chat-bubble {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  animation: bubblePop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  &.ia {
+    flex-direction: row;
+    align-self: flex-start;
+    max-width: 88%;
+  }
+
+  &.user {
+    flex-direction: row-reverse;
+    align-self: flex-end;
+    max-width: 78%;
+  }
+}
+
+.oneia-chat-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+
+  &.ia-avatar {
+    background: linear-gradient(135deg, #f77433, #ff6b1a);
+    box-shadow: 0 4px 12px rgba(247, 116, 51, 0.25);
+    animation: iaGlow 2.5s ease-in-out infinite;
+    font-size: 0.85rem;
+  }
+
+  &.user-avatar {
+    background: #f0f0f0;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    font-size: 0.75rem;
+    color: #666;
+  }
+}
+
+.oneia-chat-text {
+  padding: 0.875rem 1.125rem;
+  border-radius: 16px;
+  font-size: 0.875rem;
+  line-height: 1.65;
+  white-space: pre-wrap;
+  word-break: break-word;
+
+  .oneia-chat-bubble.ia & {
+    background: white;
+    border: 1px solid rgba(247, 116, 51, 0.12);
+    color: #444;
+    border-top-left-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  }
+
+  .oneia-chat-bubble.user & {
+    background: linear-gradient(135deg, #f77433, #e85c0d);
+    color: white;
+    font-weight: 500;
+    border-top-right-radius: 4px;
+    box-shadow: 0 4px 16px rgba(247, 116, 51, 0.15);
+  }
+}
+
+// Cursor piscante do typewriter
+.oneia-cursor {
+  display: inline-block;
+  color: #f77433;
+  font-weight: 700;
+  margin-left: 1px;
+  animation: cursorBlink 0.9s step-end infinite;
+}
+
+// ═══════════════════════════════════════════════════
+//  Indicador "IA digitando..."
+// ═══════════════════════════════════════════════════
+.oneia-typing-dots {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  padding: 0.875rem 1.125rem;
+  background: white;
+  border: 1px solid rgba(247, 116, 51, 0.1);
+  border-radius: 16px;
+  border-top-left-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+
+  span {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #f77433;
+    display: block;
+    animation: typingDot 1.4s ease-in-out infinite;
+
+    &:nth-child(1) { animation-delay: 0s; }
+    &:nth-child(2) { animation-delay: 0.2s; }
+    &:nth-child(3) { animation-delay: 0.4s; }
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  Rodapé — input + botão
+// ═══════════════════════════════════════════════════
+.oneia-chat-footer {
+  padding: 1rem 1.25rem 1.25rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  background: white;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.oneia-input-wrapper {
+  display: flex;
+  align-items: center; // Centraliza verticalmente
+  gap: 10px;
+  background: #f8f8f8;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 24px;
+  padding: 6px 6px 6px 16px;
+  transition: all 0.2s;
+
+  &:focus-within {
+    border-color: #f77433;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(247, 116, 51, 0.1);
+  }
+}
+
+.oneia-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #333;
+  font-size: 0.9rem;
+  font-family: inherit;
+  resize: none;
+  line-height: 1.4;
+  max-height: 100px;
+  overflow-y: auto;
+  text-align: center; // Centraliza horizontalmente como pedido
+  padding: 8px 0; // Ajuste para ficar "no centro" verticalmente
+
+  &::placeholder {
+    color: #aaa;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.oneia-send-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(135deg, #f77433, #e85c0d);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(247, 116, 51, 0.2);
+
+  &:hover:not(:disabled) {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(247, 116, 51, 0.3);
+  }
+
+  &:disabled {
+    background: #e0e0e0;
+    box-shadow: none;
+    cursor: not-allowed;
+    color: #aaa;
+  }
+}
+
+.oneia-counter {
+  font-size: 0.72rem;
+  color: #999;
+  text-align: right;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.oneia-limit-msg {
+  padding: 0.875rem 1rem;
+  background: #fdf2f0;
+  border: 1px solid rgba(247, 116, 51, 0.15);
+  border-radius: 12px;
+  color: #f77433;
+  font-size: 0.82rem;
+  text-align: center;
+  font-weight: 600;
+}
+
+// ═══════════════════════════════════════════════════
+//  Responsivo
+// ═══════════════════════════════════════════════════
+@media (max-width: 640px) {
+  .oneia-modal-content {
+    border-radius: 0;
+    max-height: 100vh;
+    height: 100vh;
+  }
+}
